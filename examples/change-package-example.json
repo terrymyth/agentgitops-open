@@ -1,0 +1,104 @@
+{
+  "id": "pkg_task-001",
+  "taskId": "task-001",
+  "projectId": "demo-web",
+  "version": "1.0.0",
+  "agent": {
+    "name": "claude-code",
+    "adapter": "claude-code",
+    "sessionId": "session_abc123"
+  },
+  "baseBranch": "main",
+  "targetBranch": "agent/task-001/claude-code",
+  "objective": "Fix expired token returning 500",
+  "background": "Users report 500 errors when token expires. Should return 401 and redirect to login.",
+  "summary": "3 files changed (+45 -12)",
+  "changedFiles": [
+    "src/auth/login.ts",
+    "src/auth/login.test.ts",
+    "src/middleware/token-check.ts"
+  ],
+  "stats": {
+    "filesChanged": 3,
+    "insertions": 45,
+    "deletions": 12
+  },
+  "diffSummary": {
+    "src/auth/login.ts": { "insertions": 20, "deletions": 5, "hunks": 3 },
+    "src/auth/login.test.ts": { "insertions": 15, "deletions": 2, "hunks": 2 },
+    "src/middleware/token-check.ts": { "insertions": 10, "deletions": 5, "hunks": 2 }
+  },
+  "checks": [
+    {
+      "name": "lint",
+      "status": "passed",
+      "command": "npm run lint",
+      "exitCode": 0,
+      "duration": 1200
+    },
+    {
+      "name": "test",
+      "status": "passed",
+      "command": "npm test",
+      "exitCode": 0,
+      "duration": 5400
+    }
+  ],
+  "risk": {
+    "level": "medium",
+    "domains": ["auth", "security"],
+    "highRiskFilesTouched": true,
+    "forbiddenFilesTouched": false,
+    "requiredReviewers": ["security-team"],
+    "violations": []
+  },
+  "evidence": {
+    "securityScan": {
+      "status": "passed",
+      "findings": 0,
+      "provider": "builtin-secret-scan",
+      "summary": "No secrets detected in changed files."
+    },
+    "comparison": {
+      "comparedPackages": 2,
+      "overlappingFiles": ["src/middleware/token-check.ts"],
+      "insertionDelta": 5,
+      "deletionDelta": -3
+    }
+  },
+  "unverifiedItems": [],
+  "conflicts": [
+    {
+      "id": "conflict_001",
+      "type": "same_file",
+      "conflictingTaskId": "task-002",
+      "filePath": "src/middleware/token-check.ts",
+      "severity": "medium",
+      "suggestion": "serial_merge",
+      "status": "open"
+    }
+  ],
+  "changeIntents": [
+    {
+      "file": "src/auth/login.ts",
+      "intent": "Add token expiry check and return 401 instead of 500",
+      "changeType": "modify"
+    },
+    {
+      "file": "src/auth/login.test.ts",
+      "intent": "Add test cases for expired token scenario",
+      "changeType": "modify"
+    },
+    {
+      "file": "src/middleware/token-check.ts",
+      "intent": "Update middleware to handle expired token gracefully",
+      "changeType": "modify"
+    }
+  ],
+  "impactedAreas": ["auth", "middleware"],
+  "breakingChanges": false,
+  "mergeRecommendation": "需要至少一个 Owner 审核后合并",
+  "prUrl": "https://github.com/user/demo-web/pull/42",
+  "prNumber": 42,
+  "createdAt": "2026-07-12T10:00:00.000Z"
+}

@@ -1,0 +1,16 @@
+apiVersion: v2
+name: agentgitops
+description: AgentGitOps - Agentic GitOps Control Plane for Code Agents
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+keywords:
+  - gitops
+  - ai-coding
+  - agent
+  - governance
+home: https://github.com/terrymyth/agentgitops-open
+sources:
+  - https://github.com/terrymyth/agentgitops-open
+maintainers:
+  - name: agentgitops team

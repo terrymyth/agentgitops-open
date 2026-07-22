@@ -1,0 +1,54 @@
+# GitHub Actions template for agentgitops CI integration
+#
+# Usage: Copy this file to .github/workflows/agentgitops-ci.yml
+#
+# This template runs agentgitops verification in your CI pipeline.
+# It checks out the code, initializes agentgitops, and runs doctor + test + package.
+
+name: AgentGitOps CI
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main]
+
+jobs:
+  agentgitops-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install agentgitops
+        run: npm install -g agentgitops
+
+      - name: Initialize agentgitops
+        run: agentgitops init --name ${{ github.event.repository.name }} --force
+
+      - name: Run doctor
+        run: agentgitops doctor
+
+      - name: Run tests (if configured)
+        run: agentgitops test --task ${{ github.head_ref || 'ci' }} || true
+        continue-on-error: true
+
+      - name: Generate Change Package (if task exists)
+        run: agentgitops package --task ${{ github.head_ref || 'ci' }} || true
+        continue-on-error: true
+
+      - name: Upload Change Package
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: change-package
+          path: .agentgitops/packages/
+          if-no-files-found: ignore

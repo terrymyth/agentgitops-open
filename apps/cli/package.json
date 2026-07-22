@@ -1,0 +1,42 @@
+{
+  "name": "agentgitops",
+  "version": "0.1.0",
+  "description": "Agent-native GitOps control plane for code agents — let multiple code agents write code in parallel, while every line merged into main stays explainable, verifiable, auditable, and reversible.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "bin": {
+    "agentgitops": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/terrymyth/agentgitops-open.git",
+    "directory": "apps/cli"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run --passWithNoTests",
+    "lint": "eslint src --max-warnings 0",
+    "typecheck": "tsc --noEmit",
+    "clean": "rimraf dist coverage"
+  },
+  "dependencies": {
+    "@agentgitops/core": "workspace:*",
+    "@agentgitops/git": "workspace:*",
+    "@agentgitops/local-hub": "workspace:*",
+    "@agentgitops/server": "workspace:*",
+    "commander": "^12.1.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.0",
+    "vitest": "^2.1.0",
+    "rimraf": "^6.0.1"
+  }
+}

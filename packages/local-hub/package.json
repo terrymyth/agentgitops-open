@@ -1,0 +1,57 @@
+{
+  "name": "@agentgitops/local-hub",
+  "version": "0.1.0",
+  "description": "Local Hub for agentgitops — workspace, agent adapters, change package, policy, merge gate, team sync, enterprise providers",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/terrymyth/agentgitops-open.git",
+    "directory": "packages/local-hub"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run --passWithNoTests",
+    "lint": "eslint src --max-warnings 0",
+    "typecheck": "tsc --noEmit",
+    "clean": "rimraf dist coverage"
+  },
+  "dependencies": {
+    "@agentgitops/core": "workspace:*",
+    "@agentgitops/git": "workspace:*",
+    "execa": "^9.5.0",
+    "jose": "^6.1.0",
+    "yaml": "^2.6.0"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.15.5",
+    "pg": "^8.16.3",
+    "rimraf": "^6.0.1",
+    "tsup": "^8.3.0",
+    "vitest": "^2.1.0"
+  },
+  "peerDependencies": {
+    "pg": "^8.16.3"
+  },
+  "peerDependenciesMeta": {
+    "pg": {
+      "optional": true
+    }
+  }
+}

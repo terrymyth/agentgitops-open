@@ -1,0 +1,48 @@
+version: 1
+project:
+  name: agentgitops
+  default_branch: main
+  worktree_root: ../.agentgitops-worktrees
+git:
+  provider: github
+  remote: origin
+agents:
+  generic:
+    type: generic-cli
+    command: echo
+    args:
+      - "{{task_objective}}"
+    enabled: true
+  claude-code:
+    type: generic-cli
+    command: claude
+    enabled: true
+policies:
+  branch:
+    protected:
+      - main
+  paths: {}
+  commands: {}
+  approval: {}
+  checks:
+    github: {}
+  merge: {}
+  limits: {}
+workspace:
+  archive_statuses:
+    - merged
+    - canceled
+  cleanup_after_days: 14
+  env: {}
+task_templates: {}
+ui:
+  port: 4789
+security:
+  web:
+    require_actor: true
+    owners:
+      - local-user
+    reviewers: []
+extensions:
+  enabled: false
+  modules: []

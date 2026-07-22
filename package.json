@@ -1,0 +1,52 @@
+{
+  "name": "agentgitops",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Agent-native GitOps control plane for code agents",
+  "license": "Apache-2.0",
+  "type": "module",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "packageManager": "pnpm@9.15.0",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "test": "turbo run build && turbo run test --concurrency=2",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "smoke:pr": "node scripts/pr-smoke.mjs",
+    "smoke:pr-body-template": "node scripts/pr-body-template-smoke.mjs",
+    "smoke:team-sync-e2e": "node scripts/team-sync-e2e-smoke.mjs",
+    "smoke:web-team-sync-config": "node scripts/web-team-sync-config-smoke.mjs",
+    "smoke:relay-http-auth-cursor": "node scripts/relay-http-auth-cursor-smoke.mjs",
+    "smoke:multi-project-isolation": "node scripts/multi-project-isolation-smoke.mjs",
+    "smoke:web-ui-browser": "node scripts/web-ui-browser-smoke.mjs",
+    "smoke:deployment": "node scripts/deployment-smoke.mjs",
+    "smoke:npm-install": "node scripts/npm-install-smoke.mjs",
+    "validate:schemas": "node scripts/validate-schemas.mjs",
+    "validate:release": "node scripts/release-hygiene.mjs",
+    "validate:release:history": "node scripts/release-history-hygiene.mjs",
+    "release:npm:dry-run": "node scripts/publish-npm.js --dry-run",
+    "smoke:git-native-sync": "node scripts/git-native-sync-smoke.mjs",
+    "smoke:rebase": "node scripts/rebase-smoke.mjs",
+    "smoke:adapter": "node scripts/adapter-smoke.mjs",
+    "format": "prettier --write \"apps/**/*.{ts,tsx}\" \"packages/**/*.{ts,tsx}\" \"scripts/**/*.{js,mjs}\" \"*.{json,js,yml,yaml}\" \".github/**/*.{yml,yaml}\"",
+    "format:check": "prettier --check \"apps/**/*.{ts,tsx}\" \"packages/**/*.{ts,tsx}\" \"scripts/**/*.{js,mjs}\" \"*.{json,js,yml,yaml}\" \".github/**/*.{yml,yaml}\"",
+    "clean": "turbo run clean && rimraf node_modules"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^22.10.0",
+    "ajv": "^8.17.1",
+    "eslint": "^10.6.0",
+    "globals": "^17.7.0",
+    "playwright": "^1.55.0",
+    "prettier": "^3.4.0",
+    "rimraf": "^6.0.1",
+    "turbo": "^2.3.0",
+    "typescript": "^5.7.0",
+    "typescript-eslint": "^8.62.1",
+    "yaml": "^2.9.0"
+  }
+}

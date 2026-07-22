@@ -1,0 +1,5 @@
+interface:
+  display_name: "AgentGitOps GitOps"
+  short_description: "GitOps automation, Team Sync, enterprise governance, and L3 advanced capabilities for Code Agents"
+  default_prompt: "Use $agentgitops-gitops to run a safe AgentGitOps workflow: create tasks, run agents in isolated workspaces, generate Change Packages, create PRs, manage merges, and handle Team Sync or enterprise edition configuration."
+  version: "2.0.0"

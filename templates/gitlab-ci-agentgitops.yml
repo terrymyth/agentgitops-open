@@ -1,0 +1,28 @@
+# GitLab CI template for agentgitops integration
+#
+# Usage: Include this file in your .gitlab-ci.yml
+#   include:
+#     - template: agentgitops-ci.yml
+#   # Or copy the content directly
+#
+# This template runs agentgitops verification in your GitLab CI pipeline.
+
+agentgitops:verify:
+  stage: test
+  image: node:22-slim
+  before_script:
+    - npm install -g pnpm agentgitops
+    - apt-get update && apt-get install -y git
+  script:
+    - agentgitops init --name $CI_PROJECT_NAME --force
+    - agentgitops doctor
+    - agentgitops test --task $CI_COMMIT_REF_NAME || true
+    - agentgitops package --task $CI_COMMIT_REF_NAME || true
+  artifacts:
+    paths:
+      - .agentgitops/packages/
+    expire_in: 7 days
+    when: always
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "main"

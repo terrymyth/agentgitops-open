@@ -1,0 +1,841 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "agentgitops REST API",
+    "description": "Agent-native GitOps control plane for code agents. Let multiple code agents write code in parallel — while every line merged into main stays explainable, verifiable, auditable, and reversible.",
+    "version": "1.0.0",
+    "license": {
+      "name": "Apache-2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    },
+    "contact": {
+      "name": "agentgitops",
+      "url": "https://github.com/terrymyth/agentgitops-open"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:4789",
+      "description": "Local-first default server"
+    }
+  ],
+  "security": [{ "bearerAuth": [] }, {}],
+  "tags": [
+    { "name": "Health", "description": "健康检查" },
+    { "name": "Project", "description": "项目管理" },
+    { "name": "Tasks", "description": "任务管理" },
+    { "name": "Workspaces", "description": "工作区管理" },
+    { "name": "Change Packages", "description": "变更包管理" },
+    { "name": "Merge Queue", "description": "合并队列" },
+    { "name": "Conflicts", "description": "冲突管理" },
+    { "name": "Review", "description": "评审管理" },
+    { "name": "Audit", "description": "审计事件" },
+    { "name": "AgentOps", "description": "运营指标" },
+    { "name": "Workflow Jobs", "description": "工作流任务" },
+    { "name": "Team Sync", "description": "团队同步" },
+    { "name": "Context Feed", "description": "上下文 Feed" },
+    { "name": "Handoff Documents", "description": "交接文档" },
+    { "name": "Webhooks", "description": "Webhook 集成" },
+    { "name": "Events", "description": "实时事件流" }
+  ],
+  "paths": {
+    "/api/health": {
+      "get": {
+        "security": [],
+        "tags": ["Health"],
+        "summary": "健康检查",
+        "description": "检查服务器、Git、数据库等组件的健康状态",
+        "operationId": "getHealth",
+        "responses": {
+          "200": {
+            "description": "健康状态",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "example": "ok" },
+                    "version": { "type": "string" },
+                    "git": { "type": "object", "properties": { "available": { "type": "boolean" }, "version": { "type": "string" } } },
+                    "database": { "type": "object", "properties": { "available": { "type": "boolean" } } }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/actor": {
+      "get": {
+        "tags": ["Project"],
+        "summary": "获取当前操作者",
+        "operationId": "getActor",
+        "responses": {
+          "200": {
+            "description": "当前操作者信息",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "actor": { "type": "string", "example": "local-user" },
+                    "owner": { "type": "string" },
+                    "reviewer": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/project": {
+      "get": {
+        "tags": ["Project"],
+        "summary": "获取项目配置",
+        "operationId": "getProject",
+        "responses": {
+          "200": {
+            "description": "项目配置信息",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProjectConfig" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/project/init": {
+      "post": {
+        "tags": ["Project"],
+        "summary": "初始化项目",
+        "operationId": "initProject",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "defaultBranch": { "type": "string", "example": "main" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "初始化成功" },
+          "400": { "description": "初始化失败" }
+        }
+      }
+    },
+    "/api/projects": {
+      "get": {
+        "tags": ["Project"],
+        "summary": "列出所有注册的项目（多项目工作区）",
+        "operationId": "listProjects",
+        "responses": {
+          "200": {
+            "description": "项目列表",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/ProjectEntry" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects/add": {
+      "post": {
+        "tags": ["Project"],
+        "summary": "添加项目到注册表",
+        "operationId": "addProject",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "path"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "path": { "type": "string" },
+                  "defaultBranch": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "添加成功" },
+          "400": { "description": "路径已注册或无效" }
+        }
+      }
+    },
+    "/api/tasks": {
+      "get": {
+        "tags": ["Tasks"],
+        "summary": "列出所有任务",
+        "operationId": "listTasks",
+        "responses": {
+          "200": {
+            "description": "任务列表",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/TaskContract" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Tasks"],
+        "summary": "创建任务",
+        "operationId": "createTask",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["title"],
+                "properties": {
+                  "title": { "type": "string" },
+                  "objective": { "type": "string" },
+                  "agentId": { "type": "string" },
+                  "riskLevel": { "type": "string", "enum": ["low", "medium", "high"] },
+                  "allowedPaths": { "type": "array", "items": { "type": "string" } },
+                  "forbiddenPaths": { "type": "array", "items": { "type": "string" } }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "任务创建成功",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TaskContract" }
+              }
+            }
+          },
+          "400": { "description": "创建失败" }
+        }
+      }
+    },
+    "/api/tasks/{taskId}/run": {
+      "post": {
+        "tags": ["Tasks"],
+        "summary": "运行任务（启动 Agent）",
+        "operationId": "runTask",
+        "parameters": [
+          { "name": "taskId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "任务启动成功" },
+          "404": { "description": "任务不存在" }
+        }
+      }
+    },
+    "/api/tasks/{taskId}/package": {
+      "post": {
+        "tags": ["Tasks"],
+        "summary": "生成 Change Package",
+        "operationId": "packageTask",
+        "parameters": [
+          { "name": "taskId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Change Package 生成成功",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ChangePackage" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tasks/{taskId}/pr": {
+      "post": {
+        "tags": ["Tasks"],
+        "summary": "创建 PR",
+        "operationId": "createPr",
+        "parameters": [
+          { "name": "taskId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "PR 创建成功" },
+          "400": { "description": "创建失败" }
+        }
+      }
+    },
+    "/api/workspaces": {
+      "get": {
+        "tags": ["Workspaces"],
+        "summary": "列出所有工作区",
+        "operationId": "listWorkspaces",
+        "responses": {
+          "200": {
+            "description": "工作区列表",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Workspace" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/change-packages": {
+      "get": {
+        "tags": ["Change Packages"],
+        "summary": "列出所有 Change Package",
+        "operationId": "listChangePackages",
+        "responses": {
+          "200": {
+            "description": "Change Package 列表",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/ChangePackage" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/merge-queue": {
+      "get": {
+        "tags": ["Merge Queue"],
+        "summary": "列出合并队列",
+        "operationId": "listMergeQueue",
+        "responses": {
+          "200": {
+            "description": "合并队列列表",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/MergeQueueItem" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/merge-queue/{taskId}/approve": {
+      "post": {
+        "tags": ["Merge Queue"],
+        "summary": "批准合并",
+        "operationId": "approveMerge",
+        "parameters": [
+          { "name": "taskId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "合并批准成功" },
+          "400": { "description": "合并被阻止（门禁未通过）" }
+        }
+      }
+    },
+    "/api/merge-queue/{taskId}/block": {
+      "post": {
+        "tags": ["Merge Queue"],
+        "summary": "阻止合并",
+        "operationId": "blockMerge",
+        "parameters": [
+          { "name": "taskId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "合并已阻止" }
+        }
+      }
+    },
+    "/api/conflicts": {
+      "get": {
+        "tags": ["Conflicts"],
+        "summary": "列出所有冲突",
+        "operationId": "listConflicts",
+        "responses": {
+          "200": {
+            "description": "冲突列表",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Conflict" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/conflicts/{conflictId}/resolve": {
+      "post": {
+        "tags": ["Conflicts"],
+        "summary": "解决冲突",
+        "operationId": "resolveConflict",
+        "parameters": [
+          { "name": "conflictId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "冲突已解决" }
+        }
+      }
+    },
+    "/api/conflicts/{conflictId}/false-positive": {
+      "post": {
+        "tags": ["Conflicts"],
+        "summary": "标记冲突为误报",
+        "operationId": "markFalsePositive",
+        "parameters": [
+          { "name": "conflictId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "已标记为误报" }
+        }
+      }
+    },
+    "/api/audit": {
+      "get": {
+        "tags": ["Audit"],
+        "summary": "查询审计事件",
+        "operationId": "listAuditEvents",
+        "parameters": [
+          { "name": "taskId", "in": "query", "schema": { "type": "string" } },
+          { "name": "eventType", "in": "query", "schema": { "type": "string" } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 100 } }
+        ],
+        "responses": {
+          "200": {
+            "description": "审计事件列表",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/AuditEvent" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/agentops": {
+      "get": {
+        "tags": ["AgentOps"],
+        "summary": "获取 AgentOps 运营指标",
+        "operationId": "getAgentOps",
+        "responses": {
+          "200": {
+            "description": "AgentOps 指标",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AgentOpsMetrics" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/workflow-jobs": {
+      "get": {
+        "tags": ["Workflow Jobs"],
+        "summary": "列出工作流任务",
+        "operationId": "listWorkflowJobs",
+        "parameters": [
+          { "name": "status", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "工作流任务列表",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/WorkflowJob" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/workflow-jobs/{jobId}/retry": {
+      "post": {
+        "tags": ["Workflow Jobs"],
+        "summary": "重试工作流任务",
+        "operationId": "retryWorkflowJob",
+        "parameters": [
+          { "name": "jobId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "重试已触发" }
+        }
+      }
+    },
+    "/api/workflow-jobs/{jobId}/cancel": {
+      "post": {
+        "tags": ["Workflow Jobs"],
+        "summary": "取消工作流任务",
+        "operationId": "cancelWorkflowJob",
+        "parameters": [
+          { "name": "jobId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "已取消" }
+        }
+      }
+    },
+    "/api/sync/push": {
+      "post": {
+        "tags": ["Team Sync"],
+        "summary": "推送同步事件到 Relay",
+        "operationId": "syncPush",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/SyncPushRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "推送成功" },
+          "401": { "description": "认证失败" }
+        }
+      }
+    },
+    "/api/sync/pull": {
+      "post": {
+        "tags": ["Team Sync"],
+        "summary": "从 Relay 拉取同步事件",
+        "operationId": "syncPull",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "teamId": { "type": "string" },
+                  "since": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "拉取成功" },
+          "401": { "description": "认证失败" }
+        }
+      }
+    },
+    "/api/team/status": {
+      "get": {
+        "tags": ["Team Sync"],
+        "summary": "获取团队状态",
+        "operationId": "getTeamStatus",
+        "responses": {
+          "200": { "description": "团队状态" }
+        }
+      }
+    },
+    "/api/team/tasks": {
+      "get": {
+        "tags": ["Team Sync"],
+        "summary": "获取团队任务列表",
+        "operationId": "getTeamTasks",
+        "responses": {
+          "200": { "description": "团队任务列表" }
+        }
+      }
+    },
+    "/api/team/conflicts": {
+      "get": {
+        "tags": ["Team Sync"],
+        "summary": "获取团队冲突列表",
+        "operationId": "getTeamConflicts",
+        "responses": {
+          "200": { "description": "团队冲突列表" }
+        }
+      }
+    },
+    "/api/team/sync-status": {
+      "get": {
+        "tags": ["Team Sync"],
+        "summary": "获取自动同步状态",
+        "operationId": "getSyncStatus",
+        "responses": {
+          "200": { "description": "同步状态" }
+        }
+      }
+    },
+    "/api/team/sync-now": {
+      "post": {
+        "tags": ["Team Sync"],
+        "summary": "立即触发同步",
+        "operationId": "syncNow",
+        "responses": {
+          "200": { "description": "同步已触发" }
+        }
+      }
+    },
+    "/api/team/sync-watch": {
+      "get": {
+        "tags": ["Team Sync"],
+        "summary": "同步状态实时流（SSE）",
+        "operationId": "syncWatch",
+        "responses": {
+          "200": { "description": "SSE 事件流" }
+        }
+      }
+    },
+    "/api/context-feed": {
+      "get": {
+        "tags": ["Context Feed"],
+        "summary": "获取 Context Feed 预览",
+        "operationId": "getContextFeed",
+        "parameters": [
+          { "name": "taskId", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Context Feed 内容" }
+        }
+      }
+    },
+    "/api/handoff-docs": {
+      "get": {
+        "tags": ["Handoff Documents"],
+        "summary": "列出交接文档",
+        "operationId": "listHandoffDocs",
+        "responses": {
+          "200": { "description": "交接文档列表" }
+        }
+      }
+    },
+    "/api/logs": {
+      "get": {
+        "tags": ["Tasks"],
+        "summary": "列出 Agent 会话日志",
+        "operationId": "listLogs",
+        "responses": {
+          "200": { "description": "日志列表" }
+        }
+      }
+    },
+    "/api/agent-notes": {
+      "get": {
+        "tags": ["Tasks"],
+        "summary": "列出 Agent Notes",
+        "operationId": "listAgentNotes",
+        "responses": {
+          "200": { "description": "Agent Notes 列表" }
+        }
+      }
+    },
+    "/api/events/stream": {
+      "get": {
+        "tags": ["Events"],
+        "summary": "实时事件流（SSE）",
+        "description": "Server-Sent Events 流，推送任务状态变更、审计事件等",
+        "operationId": "streamEvents",
+        "responses": {
+          "200": {
+            "description": "SSE 事件流",
+            "content": {
+              "text/event-stream": {}
+            }
+          }
+        }
+      }
+    },
+    "/api/webhooks/github": {
+      "post": {
+        "tags": ["Webhooks"],
+        "summary": "GitHub Webhook 接收",
+        "description": "接收 GitHub Webhook 事件（push/pull_request/check_run 等）",
+        "operationId": "githubWebhook",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "type": "object" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Webhook 处理成功" },
+          "401": { "description": "签名验证失败" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Required when an Enterprise OIDC identity provider is configured. CE local-first mode does not require it."
+      }
+    },
+    "schemas": {
+      "ProjectConfig": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "defaultBranch": { "type": "string" },
+          "gitProvider": { "type": "string" },
+          "agents": { "type": "object" },
+          "policies": { "type": "object" }
+        }
+      },
+      "ProjectEntry": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "path": { "type": "string" },
+          "defaultBranch": { "type": "string" },
+          "port": { "type": "integer" },
+          "lastActiveAt": { "type": "string" }
+        }
+      },
+      "TaskContract": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "projectId": { "type": "string" },
+          "title": { "type": "string" },
+          "objective": { "type": "string" },
+          "status": { "type": "string", "enum": ["planning", "running", "testing", "packaging", "reviewing", "blocked", "merged", "failed", "canceled"] },
+          "riskLevel": { "type": "string", "enum": ["low", "medium", "high"] },
+          "agentId": { "type": "string" },
+          "baseBranch": { "type": "string" },
+          "targetBranch": { "type": "string" },
+          "allowedPaths": { "type": "array", "items": { "type": "string" } },
+          "forbiddenPaths": { "type": "array", "items": { "type": "string" } },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Workspace": {
+        "type": "object",
+        "properties": {
+          "taskId": { "type": "string" },
+          "path": { "type": "string" },
+          "agentName": { "type": "string" },
+          "baseBranch": { "type": "string" },
+          "targetBranch": { "type": "string" },
+          "status": { "type": "string" },
+          "changedFiles": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "ChangePackage": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "taskId": { "type": "string" },
+          "diff": { "type": "object" },
+          "verification": { "type": "object" },
+          "riskLevel": { "type": "string" },
+          "unverifiedItems": { "type": "array", "items": { "type": "string" } },
+          "conflicts": { "type": "array" },
+          "mergeRecommendation": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "MergeQueueItem": {
+        "type": "object",
+        "properties": {
+          "taskId": { "type": "string" },
+          "riskLevel": { "type": "string" },
+          "checkStatus": { "type": "string" },
+          "approvalStatus": { "type": "string" },
+          "conflictStatus": { "type": "string" },
+          "suggestedOrder": { "type": "integer" }
+        }
+      },
+      "Conflict": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "type": { "type": "string" },
+          "sourceTaskId": { "type": "string" },
+          "targetTaskId": { "type": "string" },
+          "files": { "type": "array", "items": { "type": "string" } },
+          "severity": { "type": "string" },
+          "suggestion": { "type": "string" }
+        }
+      },
+      "AuditEvent": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "taskId": { "type": "string" },
+          "eventType": { "type": "string" },
+          "actor": { "type": "string" },
+          "actorType": { "type": "string" },
+          "projectId": { "type": "string" },
+          "payload": { "type": "object" },
+          "timestamp": { "type": "string", "format": "date-time" }
+        }
+      },
+      "AgentOpsMetrics": {
+        "type": "object",
+        "properties": {
+          "totalTasks": { "type": "integer" },
+          "successRate": { "type": "number" },
+          "mergeRate": { "type": "number" },
+          "ciFirstPassRate": { "type": "number" },
+          "takeoverRate": { "type": "number" },
+          "conflictRate": { "type": "number" },
+          "rollbackRate": { "type": "number" },
+          "agentRanking": { "type": "array" }
+        }
+      },
+      "WorkflowJob": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "projectId": { "type": "string" },
+          "taskId": { "type": "string" },
+          "jobType": { "type": "string" },
+          "status": { "type": "string", "enum": ["pending", "running", "completed", "failed", "canceled"] },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "startedAt": { "type": "string", "format": "date-time" },
+          "completedAt": { "type": "string", "format": "date-time" },
+          "retryCount": { "type": "integer" }
+        }
+      },
+      "SyncPushRequest": {
+        "type": "object",
+        "properties": {
+          "teamId": { "type": "string" },
+          "events": { "type": "array" },
+          "signature": { "type": "string" }
+        }
+      }
+    }
+  }
+}

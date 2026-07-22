@@ -1,0 +1,32 @@
+{
+  "id": "pkg_task-minimal",
+  "taskId": "task-minimal",
+  "projectId": "my-project",
+  "version": "1.0.0",
+  "agent": {
+    "name": "generic",
+    "adapter": "generic-cli"
+  },
+  "baseBranch": "main",
+  "targetBranch": "agent/task-minimal",
+  "objective": "Update README",
+  "summary": "1 file changed (+5 -0)",
+  "changedFiles": ["README.md"],
+  "stats": {
+    "filesChanged": 1,
+    "insertions": 5,
+    "deletions": 0
+  },
+  "checks": [],
+  "risk": {
+    "level": "low",
+    "domains": [],
+    "highRiskFilesTouched": false,
+    "forbiddenFilesTouched": false,
+    "violations": []
+  },
+  "unverifiedItems": [],
+  "conflicts": [],
+  "mergeRecommendation": "测试通过，可自动合并",
+  "createdAt": "2026-07-12T10:00:00.000Z"
+}

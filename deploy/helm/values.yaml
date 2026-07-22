@@ -1,0 +1,74 @@
+# agentgitops Helm Chart values
+# Default values for agentgitops on Kubernetes
+
+replicaCount: 1
+
+image:
+  repository: agentgitops/server
+  pullPolicy: IfNotPresent
+  tag: "0.1.0"
+
+service:
+  type: ClusterIP
+  port: 4789
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: agentgitops.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# Persistence
+persistence:
+  enabled: true
+  storageClass: ""
+  accessMode: ReadWriteOnce
+  size: 1Gi
+  mountPath: /workspace
+
+# Environment variables
+env:
+  AGENTGITOPS_HOST: "0.0.0.0"
+  AGENTGITOPS_PORT: "4789"
+  AGENTGITOPS_MODE: "full"
+  # GITHUB_TOKEN: ""
+  # GITLAB_TOKEN: ""
+
+# Probes
+livenessProbe:
+  httpGet:
+    path: /api/health
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 30
+
+readinessProbe:
+  httpGet:
+    path: /api/health
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 10
+
+# Autoscaling
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

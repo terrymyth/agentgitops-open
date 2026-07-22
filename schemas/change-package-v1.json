@@ -1,0 +1,235 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentgitops.dev/schemas/change-package/v1.json",
+  "title": "AgentGitOps Change Package v1.0",
+  "description": "Standardized evidence bundle for AI code agent tasks. Contains diff, test results, risk assessment, conflicts, and merge recommendation.",
+  "type": "object",
+  "required": ["id", "taskId", "projectId", "version", "agent", "baseBranch", "targetBranch", "objective", "summary", "changedFiles", "stats", "checks", "risk", "unverifiedItems", "conflicts", "mergeRecommendation", "createdAt"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for the change package (e.g., pkg_task-001)",
+      "pattern": "^pkg_.+$"
+    },
+    "taskId": {
+      "type": "string",
+      "description": "Associated task ID"
+    },
+    "projectId": {
+      "type": "string",
+      "description": "Project name from .agentgitops.yml"
+    },
+    "version": {
+      "type": "string",
+      "description": "Schema version (e.g., 1.0.0)",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "agent": {
+      "$ref": "#/$defs/agent"
+    },
+    "baseBranch": {
+      "type": "string",
+      "description": "Base branch (e.g., main)"
+    },
+    "targetBranch": {
+      "type": "string",
+      "description": "Target/feature branch (e.g., agent/task-001/claude-code)"
+    },
+    "objective": {
+      "type": "string",
+      "description": "Task objective"
+    },
+    "background": {
+      "type": "string",
+      "description": "Optional task background"
+    },
+    "summary": {
+      "type": "string",
+      "description": "Human-readable change summary (e.g., '3 files changed (+45 -12)')"
+    },
+    "changedFiles": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "List of changed file paths (relative)"
+    },
+    "stats": {
+      "$ref": "#/$defs/stats"
+    },
+    "diffSummary": {
+      "type": "object",
+      "description": "Optional per-file diff statistics",
+      "additionalProperties": { "$ref": "#/$defs/fileDiffSummary" }
+    },
+    "checks": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/verificationRun" },
+      "description": "Verification check results"
+    },
+    "risk": {
+      "$ref": "#/$defs/riskAssessment"
+    },
+    "evidence": {
+      "$ref": "#/$defs/evidence"
+    },
+    "unverifiedItems": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Known unverified items"
+    },
+    "conflicts": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/conflict" },
+      "description": "Detected conflicts with other tasks"
+    },
+    "changeIntents": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/changeIntent" },
+      "description": "Per-file change intent (what and why)"
+    },
+    "impactedAreas": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Impacted functional areas"
+    },
+    "breakingChanges": {
+      "type": "boolean",
+      "description": "Whether breaking changes were detected"
+    },
+    "mergeRecommendation": {
+      "type": "string",
+      "description": "Merge recommendation text"
+    },
+    "prUrl": {
+      "type": "string",
+      "format": "uri",
+      "description": "PR/MR URL if created"
+    },
+    "prNumber": {
+      "type": "integer",
+      "description": "PR/MR number"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Creation timestamp (ISO 8601)"
+    }
+  },
+  "$defs": {
+    "agent": {
+      "type": "object",
+      "required": ["name", "adapter"],
+      "properties": {
+        "name": { "type": "string", "description": "Agent name (e.g., claude-code)" },
+        "adapter": { "type": "string", "description": "Adapter type (e.g., generic-cli)" },
+        "sessionId": { "type": "string", "description": "Optional session ID" }
+      }
+    },
+    "stats": {
+      "type": "object",
+      "required": ["filesChanged", "insertions", "deletions"],
+      "properties": {
+        "filesChanged": { "type": "integer", "minimum": 0 },
+        "insertions": { "type": "integer", "minimum": 0 },
+        "deletions": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "fileDiffSummary": {
+      "type": "object",
+      "required": ["insertions", "deletions", "hunks"],
+      "properties": {
+        "insertions": { "type": "integer", "minimum": 0 },
+        "deletions": { "type": "integer", "minimum": 0 },
+        "hunks": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "verificationRun": {
+      "type": "object",
+      "required": ["name", "status"],
+      "properties": {
+        "name": { "type": "string" },
+        "status": { "type": "string", "enum": ["passed", "failed", "skipped"] },
+        "command": { "type": "string" },
+        "exitCode": { "type": "integer" },
+        "duration": { "type": "integer" },
+        "output": { "type": "string" },
+        "errorSummary": { "type": "string" }
+      }
+    },
+    "riskAssessment": {
+      "type": "object",
+      "required": ["level", "domains", "highRiskFilesTouched", "forbiddenFilesTouched", "violations"],
+      "properties": {
+        "level": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+        "domains": { "type": "array", "items": { "type": "string" } },
+        "highRiskFilesTouched": { "type": "boolean" },
+        "forbiddenFilesTouched": { "type": "boolean" },
+        "requiredReviewers": { "type": "array", "items": { "type": "string" } },
+        "violations": { "type": "array", "items": { "$ref": "#/$defs/policyViolation" } }
+      }
+    },
+    "policyViolation": {
+      "type": "object",
+      "required": ["rule", "message", "severity"],
+      "properties": {
+        "rule": { "type": "string" },
+        "file": { "type": "string" },
+        "message": { "type": "string" },
+        "severity": { "type": "string", "enum": ["error", "warning"] }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "required": ["securityScan", "comparison"],
+      "properties": {
+        "securityScan": {
+          "type": "object",
+          "required": ["status", "findings", "summary"],
+          "properties": {
+            "status": { "type": "string", "enum": ["not_configured", "passed", "failed"] },
+            "findings": { "type": "integer", "minimum": 0 },
+            "provider": { "type": "string" },
+            "summary": { "type": "string" }
+          }
+        },
+        "comparison": {
+          "type": "object",
+          "required": ["comparedPackages", "overlappingFiles", "insertionDelta", "deletionDelta"],
+          "properties": {
+            "comparedPackages": { "type": "integer", "minimum": 0 },
+            "overlappingFiles": { "type": "array", "items": { "type": "string" } },
+            "insertionDelta": { "type": "integer" },
+            "deletionDelta": { "type": "integer" }
+          }
+        }
+      }
+    },
+    "conflict": {
+      "type": "object",
+      "required": ["id", "type", "conflictingTaskId", "severity", "suggestion", "status"],
+      "properties": {
+        "id": { "type": "string" },
+        "type": {
+          "type": "string",
+          "enum": ["same_file", "same_risk_domain", "dependency", "migration", "ci_config", "high_risk_concurrent", "api_contract", "type_definition", "schema", "call_chain", "test_coverage", "permission_logic", "dependency_version"]
+        },
+        "conflictingTaskId": { "type": "string" },
+        "filePath": { "type": "string" },
+        "severity": { "type": "string", "enum": ["low", "medium", "high"] },
+        "suggestion": {
+          "type": "string",
+          "enum": ["serial_merge", "rebase", "retest", "human_takeover", "mark_false_positive"]
+        },
+        "status": { "type": "string", "enum": ["open", "resolved"] }
+      }
+    },
+    "changeIntent": {
+      "type": "object",
+      "required": ["file", "intent", "changeType"],
+      "properties": {
+        "file": { "type": "string" },
+        "intent": { "type": "string" },
+        "changeType": { "type": "string", "enum": ["add", "modify", "delete", "rename"] }
+      }
+    }
+  }
+}

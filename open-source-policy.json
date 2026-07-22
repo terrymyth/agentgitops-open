@@ -1,0 +1,20 @@
+{
+  "$schema": "./schemas/open-source-policy-v1.json",
+  "version": 1,
+  "publicRepository": "git@github.com:terrymyth/agentgitops-open.git",
+  "publicDefaultBranch": "main",
+  "license": "Apache-2.0",
+  "releaseModel": "curated-snapshot-and-cherry-pick",
+  "forbiddenPaths": [
+    ".agentgitops/closeouts/**",
+    ".agentgitops/handoffs/**",
+    ".agentgitops/packages/**",
+    ".agentgitops/sync/**",
+    ".agentgitops/tasks/**",
+    ".agentgitops/verifications/**",
+    "docs/internal/**",
+    "plans/**",
+    "topdocs/**"
+  ],
+  "requiredChecks": ["ci (ubuntu-latest)", "ci (macos-latest)", "ci (windows-latest)"]
+}

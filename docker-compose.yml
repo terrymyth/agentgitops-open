@@ -1,0 +1,40 @@
+# agentgitops Docker Compose — 一键部署
+# Usage: docker-compose up
+# Access: http://localhost:4789
+
+services:
+  agentgitops:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "4789:4789"
+    volumes:
+      # Mount your project directory (contains .git and .agentgitops)
+      - ./data:/workspace
+      # Persist agentgitops data
+      - agentgitops-data:/root/.agentgitops
+    environment:
+      - AGENTGITOPS_HOST=0.0.0.0
+      - AGENTGITOPS_PORT=4789
+      # Optional: Set your GitHub token for PR creation
+      # - GITHUB_TOKEN=${GITHUB_TOKEN}
+      # Optional: Set your GitLab token
+      # - GITLAB_TOKEN=${GITLAB_TOKEN}
+    working_dir: /workspace
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://localhost:4789/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+
+volumes:
+  agentgitops-data:

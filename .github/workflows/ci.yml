@@ -1,0 +1,92 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test
+
+      - name: Web critical-path coverage
+        run: pnpm --filter @agentgitops/web test:coverage
+
+      - name: Build
+        run: pnpm build
+
+      - name: Install Chromium for browser smoke
+        if: matrix.os == 'ubuntu-latest'
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Web UI browser smoke
+        if: matrix.os == 'ubuntu-latest'
+        run: pnpm smoke:web-ui-browser
+
+      - name: Published-package install smoke
+        if: matrix.os == 'ubuntu-latest'
+        run: pnpm smoke:npm-install -- --skip-build
+
+      - name: Format check
+        run: pnpm format:check
+
+      - name: Validate schemas
+        run: pnpm validate:schemas
+
+      - name: Deployment asset smoke
+        run: pnpm smoke:deployment
+
+      - name: Public release hygiene
+        if: github.repository == 'terrymyth/agentgitops-open'
+        run: pnpm validate:release -- --public
+
+      - name: Public history hygiene
+        if: github.repository == 'terrymyth/agentgitops-open'
+        run: pnpm validate:release:history
+
+      - name: PR smoke (dry-run, local repo)
+        shell: bash
+        run: |
+          # 创建本地临时仓库用于 dry-run 冒烟（不依赖真实 GitHub token）
+          SMOKE_DIR=$(mktemp -d)
+          git init "$SMOKE_DIR/smoke-repo"
+          cd "$SMOKE_DIR/smoke-repo"
+          git config user.name "CI Smoke"
+          git config user.email "ci-smoke@example.com"
+          echo "# smoke" > README.md
+          git add README.md
+          git commit -m "initial"
+          git branch -M main
+          git remote add origin "https://github.com/example/smoke-repo.git"
+          node "$GITHUB_WORKSPACE/scripts/pr-smoke.mjs" --repo "$SMOKE_DIR/smoke-repo" --dir "$SMOKE_DIR" --name smoke-clone

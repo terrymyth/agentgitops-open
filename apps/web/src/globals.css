@@ -1,0 +1,743 @@
+/**
+ * B-End Design System — 主题 CSS Variables
+ *
+ * 用法：将此文件内容复制到项目的 app/globals.css 中（shadcn init 生成的那个）。
+ *
+ * 颜色格式：oklch()，兼容 Tailwind CSS v4。
+ * 色值来源：B 端设计规范（与旧版 theme.ts / colors.ts 完全对应）。
+ */
+
+@import "tailwindcss";
+
+/* ════════════════════════════════════════════════════
+   亮色模式
+   ════════════════════════════════════════════════════ */
+:root {
+  /* ── 页面基调 ── */
+  --background: oklch(98.09% 0.0025 228.78);      /* #F7F9FA */
+  --foreground: oklch(26.23% 0.0254 258.34);      /* #1D2531 */
+
+  /* ── 品牌主色 ── */
+  --primary: oklch(57.30% 0.2351 260.11);          /* #006BFF */
+  --primary-foreground: oklch(100% 0 0);           /* #FFFFFF */
+  --primary-hover: oklch(64.68% 0.1965 254.62);    /* #2E8CFF */
+  --primary-active: oklch(47.28% 0.2054 261.87);   /* #0051D2 */
+
+  /* ── 次要（兼容别名，语义请优先使用 muted） ── */
+  --secondary: oklch(95.63% 0.0069 247.90);        /* #EDF1F5 */
+  --secondary-foreground: oklch(26.23% 0.0254 258.34); /* #1D2531 */
+
+  /* ── 静音/辅助 ── */
+  --muted: oklch(95.63% 0.0069 247.90);            /* #EDF1F5 */
+  --muted-foreground: oklch(54.28% 0.0326 261.39); /* #657083 */
+  --tertiary-foreground: #9EA7B8;
+  --disabled-foreground: #BFC9D5;
+  --field-disabled-background: #F7F9FA;            /* 表单控件禁用底 */
+
+  /* ── 强调 ── */
+  --accent: oklch(96.34% 0.0193 240.73);           /* #E8F5FF — 主色浅底 */
+  --accent-foreground: oklch(57.30% 0.2351 260.11); /* #006BFF */
+
+  /* ── 危险/删除 ── */
+  --destructive: oklch(64.19% 0.2182 25.88);       /* #F53F3F */
+  --destructive-foreground: oklch(100% 0 0);       /* #FFFFFF */
+
+  /* ── 卡片/容器 ── */
+  --card: oklch(100% 0 0);                         /* #FFFFFF */
+  --card-foreground: oklch(26.23% 0.0254 258.34);  /* #1D2531 */
+
+  /* ── 毛玻璃卡片（用于渐变背景页面） ── */
+  --card-glass: rgba(255, 255, 255, 0.45);
+  --card-glass-border: rgba(255, 255, 255, 0.50);
+  --card-glass-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+
+  /* ── 弹层 ── */
+  --popover: oklch(100% 0 0);                      /* #FFFFFF */
+  --popover-foreground: oklch(26.23% 0.0254 258.34); /* #1D2531 */
+  --popover-shadow: 0 6px 24px rgba(7, 22, 45, 0.08);
+  --message-outline-shadow: inset 0 0 0 1px color-mix(in srgb, var(--border) 14%, transparent);
+  --message-elevation-shadow: 0 10px 30px rgba(75, 85, 105, 0.10), 0 15px 45px rgba(27, 37, 50, 0.06);
+
+  /* ── 分割线 & 组件描边 ── */
+  --border: #EDF1F5;                                /* 分割线：表格行、布局分隔 */
+  --input: #E1E7ED;                                 /* 组件描边：Input / Select / Checkbox 等 */
+  --input-disabled: #EDF1F5;                        /* 禁用描边 */
+  --ring: oklch(57.30% 0.2351 260.11);             /* #006BFF */
+
+  /* ── 图表色 ── */
+  --chart-1: oklch(57.30% 0.2351 260.11);          /* #006BFF — 品牌蓝 */
+  --chart-2: oklch(66.87% 0.2142 144.38);          /* #00B42A — 成功绿 */
+  --chart-3: oklch(72.74% 0.1877 51.75);           /* #FF7D00 — 警告橙 */
+  --chart-4: oklch(64.19% 0.2182 25.88);           /* #F53F3F — 错误红 */
+  --chart-5: oklch(54.28% 0.0326 261.39);          /* #657083 — 中性灰 */
+
+  /* ── 侧边栏 ── */
+  --sidebar: oklch(100% 0 0);                      /* #FFFFFF */
+  --sidebar-foreground: oklch(26.23% 0.0254 258.34); /* #1D2531 */
+  --sidebar-primary: oklch(57.30% 0.2351 260.11);  /* #006BFF */
+  --sidebar-primary-foreground: oklch(100% 0 0);   /* #FFFFFF */
+  --sidebar-accent: oklch(96.34% 0.0193 240.73);   /* #E8F5FF */
+  --sidebar-accent-foreground: oklch(57.30% 0.2351 260.11); /* #006BFF */
+  --sidebar-border: oklch(95.63% 0.0069 247.90);   /* #EDF1F5 */
+  --sidebar-ring: oklch(57.30% 0.2351 260.11);     /* #006BFF */
+
+  /* ── 装饰渐变背景 ── */
+  --gradient-hero: radial-gradient(34.92% 37.62% at 29.06% -2.24%, rgba(70, 255, 212, 0.25) 0%, rgba(225, 255, 230, 0.00) 100%),
+    radial-gradient(30.23% 36.76% at 43.3% -3.12%, rgba(93, 128, 255, 0.25) 0%, rgba(225, 235, 255, 0.00) 100%),
+    radial-gradient(35.07% 41.06% at 62.99% -9.95%, rgba(117, 126, 255, 0.20) 0%, rgba(184, 152, 255, 0.00) 100%),
+    radial-gradient(24.57% 45.2% at 91.28% -9.06%, rgba(211, 117, 255, 0.15) 0%, rgba(184, 152, 255, 0.00) 100%),
+    #FAFBFD;
+
+  /* ── 功能型渐变色库（头像 / 图标底板） ──
+     灵感参考：https://github.com/oulume/free-gradient-colors
+     仅用于随机头像背景、卡片图标底板等小面积点缀，不替代 --gradient-hero。 */
+  --gradient-accent-sky: linear-gradient(135deg, color-mix(in srgb, var(--brand-blue-200) 70%, white) 0%, color-mix(in srgb, var(--brand-cyan-200) 76%, white) 100%);
+  --gradient-accent-sky-foreground: var(--brand-blue-700);
+  --gradient-accent-ocean: linear-gradient(135deg, color-mix(in srgb, var(--brand-cyan-200) 72%, white) 0%, color-mix(in srgb, var(--brand-blue-300) 70%, white) 100%);
+  --gradient-accent-ocean-foreground: var(--brand-cyan-800);
+  --gradient-accent-azure: linear-gradient(135deg, color-mix(in srgb, var(--brand-blue-100) 74%, white) 0%, color-mix(in srgb, var(--brand-teal-200) 68%, white) 100%);
+  --gradient-accent-azure-foreground: var(--brand-blue-800);
+  --gradient-accent-cobalt: linear-gradient(135deg, color-mix(in srgb, var(--brand-blue-200) 70%, white) 0%, color-mix(in srgb, var(--brand-purple-200) 68%, white) 100%);
+  --gradient-accent-cobalt-foreground: var(--brand-blue-800);
+  --gradient-accent-indigo: linear-gradient(135deg, color-mix(in srgb, var(--brand-purple-200) 72%, white) 0%, color-mix(in srgb, var(--brand-blue-200) 66%, white) 100%);
+  --gradient-accent-indigo-foreground: var(--brand-purple-800);
+  --gradient-accent-mint: linear-gradient(135deg, color-mix(in srgb, var(--brand-teal-200) 72%, white) 0%, color-mix(in srgb, var(--brand-green-200) 76%, white) 100%);
+  --gradient-accent-mint-foreground: var(--brand-teal-800);
+  --gradient-accent-emerald: linear-gradient(135deg, color-mix(in srgb, var(--brand-green-200) 74%, white) 0%, color-mix(in srgb, var(--brand-teal-100) 68%, white) 100%);
+  --gradient-accent-emerald-foreground: var(--brand-green-800);
+  --gradient-accent-lime: linear-gradient(135deg, color-mix(in srgb, var(--brand-lime-200) 70%, white) 0%, color-mix(in srgb, var(--brand-green-100) 72%, white) 100%);
+  --gradient-accent-lime-foreground: var(--brand-lime-800);
+  --gradient-accent-teal: linear-gradient(135deg, color-mix(in srgb, var(--brand-cyan-100) 66%, white) 0%, color-mix(in srgb, var(--brand-teal-200) 74%, white) 100%);
+  --gradient-accent-teal-foreground: var(--brand-teal-800);
+  --gradient-accent-cyan: linear-gradient(135deg, color-mix(in srgb, var(--brand-cyan-200) 78%, white) 0%, color-mix(in srgb, var(--brand-blue-100) 72%, white) 100%);
+  --gradient-accent-cyan-foreground: var(--brand-cyan-800);
+  --gradient-accent-amber: linear-gradient(135deg, color-mix(in srgb, var(--brand-gold-200) 72%, white) 0%, color-mix(in srgb, var(--brand-orange-200) 78%, white) 100%);
+  --gradient-accent-amber-foreground: var(--brand-orange-800);
+  --gradient-accent-gold: linear-gradient(135deg, color-mix(in srgb, var(--brand-gold-100) 68%, white) 0%, color-mix(in srgb, var(--brand-gold-300) 72%, white) 100%);
+  --gradient-accent-gold-foreground: var(--brand-gold-800);
+  --gradient-accent-orange: linear-gradient(135deg, color-mix(in srgb, var(--brand-orange-200) 76%, white) 0%, color-mix(in srgb, var(--brand-red-100) 64%, white) 100%);
+  --gradient-accent-orange-foreground: var(--brand-orange-800);
+  --gradient-accent-coral: linear-gradient(135deg, color-mix(in srgb, var(--brand-orange-100) 68%, white) 0%, color-mix(in srgb, var(--brand-pink-100) 66%, white) 100%);
+  --gradient-accent-coral-foreground: var(--brand-red-700);
+  --gradient-accent-rose: linear-gradient(135deg, color-mix(in srgb, var(--brand-orange-100) 68%, white) 0%, color-mix(in srgb, var(--brand-red-200) 78%, white) 100%);
+  --gradient-accent-rose-foreground: var(--brand-red-700);
+  --gradient-accent-crimson: linear-gradient(135deg, color-mix(in srgb, var(--brand-red-200) 72%, white) 0%, color-mix(in srgb, var(--brand-pink-200) 68%, white) 100%);
+  --gradient-accent-crimson-foreground: var(--brand-red-800);
+  --gradient-accent-violet: linear-gradient(135deg, color-mix(in srgb, var(--brand-purple-200) 72%, white) 0%, color-mix(in srgb, var(--brand-pink-200) 74%, white) 100%);
+  --gradient-accent-violet-foreground: var(--brand-purple-700);
+  --gradient-accent-plum: linear-gradient(135deg, color-mix(in srgb, var(--brand-purple-300) 68%, white) 0%, color-mix(in srgb, var(--brand-red-100) 62%, white) 100%);
+  --gradient-accent-plum-foreground: var(--brand-purple-800);
+  --gradient-accent-pink: linear-gradient(135deg, color-mix(in srgb, var(--brand-pink-100) 68%, white) 0%, color-mix(in srgb, var(--brand-purple-100) 64%, white) 100%);
+  --gradient-accent-pink-foreground: var(--brand-pink-700);
+  --gradient-accent-slate: linear-gradient(135deg, color-mix(in srgb, var(--brand-gray-100) 84%, white) 0%, color-mix(in srgb, var(--brand-blue-100) 70%, white) 100%);
+  --gradient-accent-slate-foreground: var(--brand-gray-700);
+
+  /* ── 圆角 ── */
+  --radius: 0.5rem; /* 8px */
+
+  /* ── 扩展色阶（图表、自定义场景使用） ── */
+
+  /* 品牌蓝 */
+  --brand-blue-50:  #E8F5FF;
+  --brand-blue-100: #BAE0FF;
+  --brand-blue-200: #8BC7FF;
+  --brand-blue-300: #5DABFF;
+  --brand-blue-400: #2E8CFF;
+  --brand-blue-500: #006BFF;
+  --brand-blue-600: #0051D2;
+  --brand-blue-700: #003AA6;
+  --brand-blue-800: #002679;
+  --brand-blue-900: #00164D;
+
+  /* 成功绿 */
+  --brand-green-50:  #E8FFEA;
+  --brand-green-100: #AFF0B5;
+  --brand-green-200: #7BE188;
+  --brand-green-300: #4CD263;
+  --brand-green-400: #23C343;
+  --brand-green-500: #00B42A;
+  --brand-green-600: #009A29;
+  --brand-green-700: #008026;
+  --brand-green-800: #006622;
+  --brand-green-900: #004D1C;
+
+  /* 错误红 */
+  --brand-red-50:  #FFECE8;
+  --brand-red-100: #FDCDC5;
+  --brand-red-200: #FBACA3;
+  --brand-red-300: #F98981;
+  --brand-red-400: #F76560;
+  --brand-red-500: #F53F3F;
+  --brand-red-600: #CB272D;
+  --brand-red-700: #A1151E;
+  --brand-red-800: #770813;
+  --brand-red-900: #4D000A;
+
+  /* 警告橙 */
+  --brand-orange-50:  #FFF7E8;
+  --brand-orange-100: #FFE4BA;
+  --brand-orange-200: #FFCF8B;
+  --brand-orange-300: #FFB65D;
+  --brand-orange-400: #FF9A2E;
+  --brand-orange-500: #FF7D00;
+  --brand-orange-600: #D25F00;
+  --brand-orange-700: #A64500;
+  --brand-orange-800: #792E00;
+  --brand-orange-900: #4D1B00;
+
+  /* 中性灰 */
+  --brand-gray-50:  #F7F9FA;
+  --brand-gray-100: #EDF1F5;
+  --brand-gray-200: #E1E7ED;
+  --brand-gray-300: #D8E0E8;
+  --brand-gray-400: #BFC9D5;
+  --brand-gray-500: #9EA7B8;
+  --brand-gray-600: #657083;
+  --brand-gray-700: #4D5567;
+  --brand-gray-800: #242E3D;
+  --brand-gray-900: #1D2531;
+
+  /* 扩展金色 */
+  --brand-gold-50:  #FFFCE8;
+  --brand-gold-100: #FDF4BF;
+  --brand-gold-200: #FCE996;
+  --brand-gold-300: #FADC6D;
+  --brand-gold-400: #F9CC45;
+  --brand-gold-500: #F7BA1E;
+  --brand-gold-600: #CC9213;
+  --brand-gold-700: #A26D0A;
+  --brand-gold-800: #774B04;
+  --brand-gold-900: #4D2D00;
+
+  /* 扩展青柠 */
+  --brand-lime-50:  #FCFFE8;
+  --brand-lime-100: #EDF8BB;
+  --brand-lime-200: #DCF190;
+  --brand-lime-300: #C9E968;
+  --brand-lime-400: #B5E241;
+  --brand-lime-500: #9FDB1D;
+  --brand-lime-600: #7EB712;
+  --brand-lime-700: #5F940A;
+  --brand-lime-800: #437004;
+  --brand-lime-900: #2A4D00;
+
+  /* 扩展蓝绿色 */
+  --brand-teal-50:  #E8FFF5;
+  --brand-teal-100: #B1F3D8;
+  --brand-teal-200: #7EE7C0;
+  --brand-teal-300: #4FDAAC;
+  --brand-teal-400: #26CE9C;
+  --brand-teal-500: #00C28F;
+  --brand-teal-600: #00A57E;
+  --brand-teal-700: #00876C;
+  --brand-teal-800: #006A58;
+  --brand-teal-900: #004D42;
+
+  /* 扩展明青 */
+  --brand-cyan-50:  #E8FFFB;
+  --brand-cyan-100: #B7F4EC;
+  --brand-cyan-200: #89E9E0;
+  --brand-cyan-300: #5EDFD6;
+  --brand-cyan-400: #37D4CF;
+  --brand-cyan-500: #14C9C9;
+  --brand-cyan-600: #0DA5AA;
+  --brand-cyan-700: #07828B;
+  --brand-cyan-800: #03616C;
+  --brand-cyan-900: #00424D;
+
+  /* 扩展蓝紫 */
+  --brand-purple-50:  #F5E8FF;
+  --brand-purple-100: #DDBEF6;
+  --brand-purple-200: #C396ED;
+  --brand-purple-300: #A871E3;
+  --brand-purple-400: #8D4EDA;
+  --brand-purple-500: #722ED1;
+  --brand-purple-600: #551DB0;
+  --brand-purple-700: #3C108F;
+  --brand-purple-800: #27066E;
+  --brand-purple-900: #16004D;
+
+  /* 扩展红紫 */
+  --brand-pink-50:  #FFE8FB;
+  --brand-pink-100: #F7BAEF;
+  --brand-pink-200: #F08EE6;
+  --brand-pink-300: #E865DF;
+  --brand-pink-400: #E13EDB;
+  --brand-pink-500: #D91AD9;
+  --brand-pink-600: #B010B6;
+  --brand-pink-700: #8A0993;
+  --brand-pink-800: #650370;
+  --brand-pink-900: #42004D;
+}
+
+/* ════════════════════════════════════════════════════
+   暗色模式
+   ════════════════════════════════════════════════════ */
+.dark {
+  /* ── 页面基调 ── */
+  --background: oklch(22.95% 0.0049 248.04);       /* #1B1D1F */
+  --foreground: oklch(90.67% 0 0);                 /* rgba(255,255,255,0.88) */
+
+  /* ── 品牌主色 ── */
+  --primary: oklch(63.63% 0.1975 256.31);           /* #2688FF */
+  --primary-foreground: oklch(100% 0 0);            /* #FFFFFF */
+  --primary-hover: oklch(70.50% 0.1650 254.00);     /* #57A8FF */
+  --primary-active: oklch(54.00% 0.2100 258.00);    /* #1F7DFF */
+
+  /* ── 次要（兼容别名，语义请优先使用 muted） ── */
+  --secondary: oklch(32.39% 0.0174 262.25);         /* #2F343D */
+  --secondary-foreground: oklch(90.67% 0 0);        /* rgba(255,255,255,0.88) */
+
+  /* ── 静音/辅助 ── */
+  --muted: oklch(29.57% 0.0123 258.37);             /* #292D33 */
+  --muted-foreground: oklch(72.52% 0 0);            /* rgba(255,255,255,0.65) */
+  --tertiary-foreground: rgba(255, 255, 255, 0.45);
+  --disabled-foreground: rgba(255, 255, 255, 0.25);
+  --field-disabled-background: rgba(255, 255, 255, 0.04); /* 表单控件禁用底 */
+
+  /* ── 强调 ── */
+  --accent: oklch(22.95% 0.1057 261.95);            /* #00164D — 主色深底 */
+  --accent-foreground: oklch(63.63% 0.1975 256.31); /* #2688FF */
+
+  /* ── 危险/删除 ── */
+  --destructive: oklch(70.92% 0.1840 19.16);        /* #FF6872 */
+  --destructive-foreground: oklch(100% 0 0);        /* #FFFFFF */
+
+  /* ── 卡片/容器 ── */
+  --card: oklch(32.39% 0.0174 262.25);              /* #2F343D */
+  --card-foreground: oklch(90.67% 0 0);             /* rgba(255,255,255,0.88) */
+
+  /* ── 毛玻璃卡片（暗色） ── */
+  --card-glass: rgba(47, 52, 61, 0.45);
+  --card-glass-border: rgba(255, 255, 255, 0.10);
+  --card-glass-shadow: 0 1px 3px rgba(0, 0, 0, 0.16), 0 1px 2px rgba(0, 0, 0, 0.10);
+
+  /* ── 弹层 ── */
+  --popover: oklch(32.39% 0.0174 262.25);           /* #2F343D */
+  --popover-foreground: oklch(90.67% 0 0);          /* rgba(255,255,255,0.88) */
+  --popover-shadow: 0 6px 24px rgba(0, 0, 0, 0.24);
+  --message-outline-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.03);
+  --message-elevation-shadow: 0 18px 42px rgba(0, 0, 0, 0.34), 0 8px 20px rgba(0, 0, 0, 0.22);
+
+  /* ── 分割线 & 组件描边 ── */
+  --border: rgba(255, 255, 255, 0.12);              /* 分割线：表格行、布局分隔 */
+  --input: rgba(255, 255, 255, 0.18);               /* 组件描边：Input / Select / Checkbox 等 */
+  --input-disabled: rgba(255, 255, 255, 0.12);      /* 禁用描边 */
+  --ring: oklch(63.63% 0.1975 256.31);              /* #2688FF */
+
+  /* ── 图表色 ── */
+  --chart-1: oklch(63.63% 0.1975 256.31);           /* #2688FF */
+  --chart-2: oklch(76.59% 0.1877 136.84);           /* #75CD49 */
+  --chart-3: oklch(78.21% 0.1636 69.35);            /* #FAA21E */
+  --chart-4: oklch(70.92% 0.1840 19.16);            /* #FF6872 */
+  --chart-5: oklch(72.52% 0 0);                     /* 中性灰 */
+
+  /* ── 侧边栏 ── */
+  --sidebar: oklch(32.39% 0.0174 262.25);           /* #2F343D */
+  --sidebar-foreground: oklch(90.67% 0 0);          /* rgba(255,255,255,0.88) */
+  --sidebar-primary: oklch(63.63% 0.1975 256.31);   /* #2688FF */
+  --sidebar-primary-foreground: oklch(100% 0 0);    /* #FFFFFF */
+  --sidebar-accent: oklch(22.95% 0.1057 261.95);    /* #00164D */
+  --sidebar-accent-foreground: oklch(63.63% 0.1975 256.31); /* #2688FF */
+  --sidebar-border: oklch(40.91% 0 0);              /* #FFFFFF1F 近似 */
+  --sidebar-ring: oklch(63.63% 0.1975 256.31);      /* #2688FF */
+
+  /* ── 装饰渐变背景（暗色） ── */
+  --gradient-hero: radial-gradient(34.92% 37.62% at 29.06% -2.24%, rgba(70, 255, 212, 0.10) 0%, rgba(225, 255, 230, 0.00) 100%),
+    radial-gradient(30.23% 36.76% at 43.3% -3.12%, rgba(93, 128, 255, 0.12) 0%, rgba(225, 235, 255, 0.00) 100%),
+    radial-gradient(35.07% 41.06% at 62.99% -9.95%, rgba(117, 126, 255, 0.10) 0%, rgba(184, 152, 255, 0.00) 100%),
+    radial-gradient(24.57% 45.2% at 91.28% -9.06%, rgba(211, 117, 255, 0.08) 0%, rgba(184, 152, 255, 0.00) 100%),
+    var(--background);
+
+  /* ── 功能型渐变色库（暗色） ── */
+  --gradient-accent-sky: linear-gradient(135deg, color-mix(in srgb, var(--brand-blue-400) 60%, black) 0%, color-mix(in srgb, var(--brand-cyan-400) 56%, black) 100%);
+  --gradient-accent-sky-foreground: var(--brand-blue-900);
+  --gradient-accent-ocean: linear-gradient(135deg, color-mix(in srgb, var(--brand-cyan-400) 58%, black) 0%, color-mix(in srgb, var(--brand-blue-400) 54%, black) 100%);
+  --gradient-accent-ocean-foreground: var(--brand-cyan-900);
+  --gradient-accent-azure: linear-gradient(135deg, color-mix(in srgb, var(--brand-blue-300) 54%, black) 0%, color-mix(in srgb, var(--brand-teal-400) 50%, black) 100%);
+  --gradient-accent-azure-foreground: var(--brand-blue-900);
+  --gradient-accent-cobalt: linear-gradient(135deg, color-mix(in srgb, var(--brand-blue-400) 58%, black) 0%, color-mix(in srgb, var(--brand-purple-400) 56%, black) 100%);
+  --gradient-accent-cobalt-foreground: var(--brand-blue-900);
+  --gradient-accent-indigo: linear-gradient(135deg, color-mix(in srgb, var(--brand-purple-400) 58%, black) 0%, color-mix(in srgb, var(--brand-blue-400) 50%, black) 100%);
+  --gradient-accent-indigo-foreground: var(--brand-purple-900);
+  --gradient-accent-mint: linear-gradient(135deg, color-mix(in srgb, var(--brand-teal-400) 58%, black) 0%, color-mix(in srgb, var(--brand-green-400) 56%, black) 100%);
+  --gradient-accent-mint-foreground: var(--brand-green-900);
+  --gradient-accent-emerald: linear-gradient(135deg, color-mix(in srgb, var(--brand-green-400) 58%, black) 0%, color-mix(in srgb, var(--brand-teal-400) 48%, black) 100%);
+  --gradient-accent-emerald-foreground: var(--brand-green-900);
+  --gradient-accent-lime: linear-gradient(135deg, color-mix(in srgb, var(--brand-lime-400) 60%, black) 0%, color-mix(in srgb, var(--brand-green-300) 46%, black) 100%);
+  --gradient-accent-lime-foreground: var(--brand-lime-900);
+  --gradient-accent-teal: linear-gradient(135deg, color-mix(in srgb, var(--brand-cyan-400) 50%, black) 0%, color-mix(in srgb, var(--brand-teal-400) 58%, black) 100%);
+  --gradient-accent-teal-foreground: var(--brand-teal-900);
+  --gradient-accent-cyan: linear-gradient(135deg, color-mix(in srgb, var(--brand-cyan-400) 60%, black) 0%, color-mix(in srgb, var(--brand-blue-300) 48%, black) 100%);
+  --gradient-accent-cyan-foreground: var(--brand-cyan-900);
+  --gradient-accent-amber: linear-gradient(135deg, color-mix(in srgb, var(--brand-gold-400) 60%, black) 0%, color-mix(in srgb, var(--brand-orange-400) 58%, black) 100%);
+  --gradient-accent-amber-foreground: var(--brand-gold-900);
+  --gradient-accent-gold: linear-gradient(135deg, color-mix(in srgb, var(--brand-gold-400) 62%, black) 0%, color-mix(in srgb, var(--brand-gold-300) 46%, black) 100%);
+  --gradient-accent-gold-foreground: var(--brand-gold-900);
+  --gradient-accent-orange: linear-gradient(135deg, color-mix(in srgb, var(--brand-orange-400) 60%, black) 0%, color-mix(in srgb, var(--brand-red-300) 46%, black) 100%);
+  --gradient-accent-orange-foreground: var(--brand-orange-900);
+  --gradient-accent-coral: linear-gradient(135deg, color-mix(in srgb, var(--brand-orange-300) 48%, black) 0%, color-mix(in srgb, var(--brand-pink-400) 52%, black) 100%);
+  --gradient-accent-coral-foreground: var(--brand-red-900);
+  --gradient-accent-rose: linear-gradient(135deg, color-mix(in srgb, var(--brand-orange-400) 54%, black) 0%, color-mix(in srgb, var(--brand-red-400) 58%, black) 100%);
+  --gradient-accent-rose-foreground: var(--brand-red-900);
+  --gradient-accent-crimson: linear-gradient(135deg, color-mix(in srgb, var(--brand-red-400) 58%, black) 0%, color-mix(in srgb, var(--brand-pink-400) 52%, black) 100%);
+  --gradient-accent-crimson-foreground: var(--brand-red-900);
+  --gradient-accent-violet: linear-gradient(135deg, color-mix(in srgb, var(--brand-purple-400) 58%, black) 0%, color-mix(in srgb, var(--brand-pink-400) 56%, black) 100%);
+  --gradient-accent-violet-foreground: var(--brand-purple-900);
+  --gradient-accent-plum: linear-gradient(135deg, color-mix(in srgb, var(--brand-purple-400) 56%, black) 0%, color-mix(in srgb, var(--brand-red-300) 42%, black) 100%);
+  --gradient-accent-plum-foreground: var(--brand-purple-900);
+  --gradient-accent-pink: linear-gradient(135deg, color-mix(in srgb, var(--brand-pink-400) 58%, black) 0%, color-mix(in srgb, var(--brand-purple-300) 44%, black) 100%);
+  --gradient-accent-pink-foreground: var(--brand-pink-900);
+  --gradient-accent-slate: linear-gradient(135deg, color-mix(in srgb, var(--brand-gray-400) 62%, black) 0%, color-mix(in srgb, var(--brand-blue-300) 42%, black) 100%);
+  --gradient-accent-slate-foreground: var(--brand-gray-900);
+
+  /* ── 品牌扩展色阶（暗色模式） ── */
+
+  /* 品牌蓝（暗色） */
+  --brand-blue-50:  #00164D;
+  --brand-blue-100: #042879;
+  --brand-blue-200: #0A40A6;
+  --brand-blue-300: #135DD2;
+  --brand-blue-400: #1F7DFF;
+  --brand-blue-500: #2688FF;
+  --brand-blue-600: #57A8FF;
+  --brand-blue-700: #87C5FF;
+  --brand-blue-800: #B8DFFF;
+  --brand-blue-900: #E8F5FF;
+
+  /* 成功绿（暗色） */
+  --brand-green-50:  #0D4D00;
+  --brand-green-100: #186904;
+  --brand-green-200: #2B8610;
+  --brand-green-300: #4DA13B;
+  --brand-green-400: #5EC035;
+  --brand-green-500: #75CD49;
+  --brand-green-600: #94D96C;
+  --brand-green-700: #B4E692;
+  --brand-green-800: #D3F2BC;
+  --brand-green-900: #F4FFEA;
+
+  /* 错误红（暗色） */
+  --brand-red-50:  #4D000F;
+  --brand-red-100: #790A1C;
+  --brand-red-200: #A61F31;
+  --brand-red-300: #D23F4D;
+  --brand-red-400: #FF6872;
+  --brand-red-500: #FF8488;
+  --brand-red-600: #FF9E9E;
+  --brand-red-700: #FFB9B7;
+  --brand-red-800: #FFD4D1;
+  --brand-red-900: #FFECEA;
+
+  /* 警告橙（暗色） */
+  --brand-orange-50:  #4D1700;
+  --brand-orange-100: #792901;
+  --brand-orange-200: #A6440C;
+  --brand-orange-300: #D2651C;
+  --brand-orange-400: #FF8A31;
+  --brand-orange-500: #EB642A;
+  --brand-orange-600: #FFB66C;
+  --brand-orange-700: #FFCE97;
+  --brand-orange-800: #FFE4C2;
+  --brand-orange-900: #FFF8EE;
+
+  /* 中性灰（暗色） */
+  --brand-gray-50:  #121314;
+  --brand-gray-100: #1B1D1F;
+  --brand-gray-200: #222428;
+  --brand-gray-300: #292D33;
+  --brand-gray-400: #2F343D;
+  --brand-gray-500: #727D8F;
+  --brand-gray-600: #8C9BB8;
+  --brand-gray-700: #CFD9E6;
+  --brand-gray-800: #E6EDF5;
+  --brand-gray-900: #F1F2F3;
+
+  /* 扩展金色（暗色） */
+  --brand-gold-50:  #4D2400;
+  --brand-gold-100: #783E04;
+  --brand-gold-200: #A35C0A;
+  --brand-gold-300: #CF7D13;
+  --brand-gold-400: #FAA21E;
+  --brand-gold-500: #FBAD26;
+  --brand-gold-600: #FCC556;
+  --brand-gold-700: #FDDA86;
+  --brand-gold-800: #FEEBB7;
+  --brand-gold-900: #FFFAE8;
+
+  /* 扩展青柠（暗色） */
+  --brand-lime-50:  #334D00;
+  --brand-lime-100: #486504;
+  --brand-lime-200: #607E0F;
+  --brand-lime-300: #7B971E;
+  --brand-lime-400: #96B031;
+  --brand-lime-500: #ACC045;
+  --brand-lime-600: #C2D068;
+  --brand-lime-700: #D8DF8F;
+  --brand-lime-800: #EBEFBA;
+  --brand-lime-900: #FEFFEA;
+
+  /* 扩展蓝绿色（暗色） */
+  --brand-teal-50:  #004D40;
+  --brand-teal-100: #086552;
+  --brand-teal-200: #157D65;
+  --brand-teal-300: #279678;
+  --brand-teal-400: #3DAE8D;
+  --brand-teal-500: #54BE9B;
+  --brand-teal-600: #74CEAD;
+  --brand-teal-700: #98DFC3;
+  --brand-teal-800: #C0EFDB;
+  --brand-teal-900: #EBFFF5;
+
+  /* 扩展明青（暗色） */
+  --brand-cyan-50:  #00344D;
+  --brand-cyan-100: #04516F;
+  --brand-cyan-200: #0B7091;
+  --brand-cyan-300: #1591B4;
+  --brand-cyan-400: #22B4D6;
+  --brand-cyan-500: #2CC3DE;
+  --brand-cyan-600: #57D6E6;
+  --brand-cyan-700: #85E6EF;
+  --brand-cyan-800: #B6F4F7;
+  --brand-cyan-900: #EAFFFF;
+
+  /* 扩展蓝紫（暗色） */
+  --brand-purple-50:  #01004D;
+  --brand-purple-100: #110B79;
+  --brand-purple-200: #2A1FA5;
+  --brand-purple-300: #4E3DD1;
+  --brand-purple-400: #7A63ED;
+  --brand-purple-500: #937CFD;
+  --brand-purple-600: #AF98FE;
+  --brand-purple-700: #C7B4FE;
+  --brand-purple-800: #DDD1FF;
+  --brand-purple-900: #F3EDFF;
+
+  /* 扩展红紫（暗色） */
+  --brand-pink-50:  #2B004D;
+  --brand-pink-100: #4B0679;
+  --brand-pink-200: #7219A6;
+  --brand-pink-300: #9E35D2;
+  --brand-pink-400: #CD5AFF;
+  --brand-pink-500: #DA73FF;
+  --brand-pink-600: #E692FF;
+  --brand-pink-700: #EFB0FF;
+  --brand-pink-800: #F7CFFF;
+  --brand-pink-900: #FDEFFF;
+}
+
+/* ════════════════════════════════════════════════════
+   Tailwind CSS v4 @theme 注册
+   ════════════════════════════════════════════════════ */
+@theme inline {
+  /* 语义色 */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-active: var(--primary-active);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-field-disabled: var(--field-disabled-background);
+  --color-tertiary-foreground: var(--tertiary-foreground);
+  --color-disabled-foreground: var(--disabled-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-disabled: var(--input-disabled);
+  --color-ring: var(--ring);
+
+  /* 图表色 */
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* 侧边栏 */
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* 装饰渐变 */
+  --gradient-hero: var(--gradient-hero);
+  --gradient-accent-sky: var(--gradient-accent-sky);
+  --gradient-accent-ocean: var(--gradient-accent-ocean);
+  --gradient-accent-azure: var(--gradient-accent-azure);
+  --gradient-accent-cobalt: var(--gradient-accent-cobalt);
+  --gradient-accent-indigo: var(--gradient-accent-indigo);
+  --gradient-accent-mint: var(--gradient-accent-mint);
+  --gradient-accent-emerald: var(--gradient-accent-emerald);
+  --gradient-accent-lime: var(--gradient-accent-lime);
+  --gradient-accent-teal: var(--gradient-accent-teal);
+  --gradient-accent-cyan: var(--gradient-accent-cyan);
+  --gradient-accent-amber: var(--gradient-accent-amber);
+  --gradient-accent-gold: var(--gradient-accent-gold);
+  --gradient-accent-orange: var(--gradient-accent-orange);
+  --gradient-accent-coral: var(--gradient-accent-coral);
+  --gradient-accent-rose: var(--gradient-accent-rose);
+  --gradient-accent-crimson: var(--gradient-accent-crimson);
+  --gradient-accent-violet: var(--gradient-accent-violet);
+  --gradient-accent-plum: var(--gradient-accent-plum);
+  --gradient-accent-pink: var(--gradient-accent-pink);
+  --gradient-accent-slate: var(--gradient-accent-slate);
+
+  /* 圆角 */
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+/* ════════════════════════════════════════════════════
+   基础样式
+   ════════════════════════════════════════════════════ */
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Helvetica Neue", "PingFang SC", "Noto Sans", "Noto Sans CJK SC",
+      "Microsoft YaHei", sans-serif;
+  }
+}
+
+/* ════════════════════════════════════════════════════
+   工具类
+   ════════════════════════════════════════════════════ */
+@layer utilities {
+  /* 毛玻璃卡片 — 用于渐变背景页面上的 Card */
+  .card-glass {
+    @apply backdrop-blur-md;
+    background: var(--card-glass);
+    border: 1px solid var(--card-glass-border);
+    box-shadow: var(--card-glass-shadow);
+  }
+
+  /* Message / Toast */
+  .message-stack {
+    display: flex;
+    width: min(100%, 356px);
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .message {
+    position: relative;
+    display: flex;
+    min-height: 46px;
+    width: 100%;
+    align-items: center;
+    gap: 16px;
+    box-sizing: border-box;
+    border-radius: var(--radius-lg);
+    background: var(--card);
+    padding: 12px 16px;
+    color: var(--foreground);
+    box-shadow: var(--message-outline-shadow), var(--message-elevation-shadow);
+  }
+
+  .message--closable {
+    min-height: 48px;
+  }
+
+  .message__main {
+    display: inline-flex;
+    min-width: 0;
+    flex: 1 1 auto;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .message__icon {
+    display: inline-flex;
+    width: 20px;
+    height: 20px;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--brand-blue-400);
+  }
+
+  .message__icon svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .message__text {
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 14px;
+    line-height: 22px;
+    font-weight: 600;
+    color: var(--foreground);
+  }
+
+  .message__close {
+    display: inline-flex;
+    width: 22px;
+    height: 22px;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: none;
+    background: transparent;
+    color: var(--tertiary-foreground);
+    cursor: pointer;
+    padding: 0;
+    transition: opacity 0.15s ease, color 0.15s ease;
+  }
+
+  .message__close:hover:not(:disabled) {
+    opacity: 1;
+    color: var(--muted-foreground);
+  }
+
+  .message__close:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--ring) 20%, transparent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  .message__close svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+
+  .message--notice .message__icon {
+    color: var(--brand-blue-400);
+  }
+
+  .message--success .message__icon {
+    color: var(--brand-green-500);
+  }
+
+  .message--error .message__icon {
+    color: var(--destructive);
+  }
+
+  .message--warning .message__icon {
+    color: var(--brand-orange-400);
+  }
+}

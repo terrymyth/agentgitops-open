@@ -1,0 +1,14 @@
+.git
+.github
+.agentgitops
+.agentgitops-worktrees
+.turbo
+**/node_modules
+**/dist
+**/coverage
+*.log
+.env
+.env.*
+docs
+plans
+topdocs

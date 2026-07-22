@@ -1,0 +1,288 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentgitops.dev/schemas/agentgitops-config/v1.json",
+  "title": "AgentGitOps Configuration v1.0",
+  "description": "Configuration schema for .agentgitops.yml",
+  "type": "object",
+  "required": ["version", "project", "git", "agents"],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "description": "Configuration version",
+      "const": 1
+    },
+    "project": {
+      "$ref": "#/$defs/project"
+    },
+    "git": {
+      "$ref": "#/$defs/git"
+    },
+    "agents": {
+      "type": "object",
+      "description": "Agent configurations keyed by name",
+      "additionalProperties": { "$ref": "#/$defs/agent" }
+    },
+    "policies": { "$ref": "#/$defs/policies" },
+    "organization": { "$ref": "#/$defs/organization" },
+    "workspace": { "$ref": "#/$defs/workspace" },
+    "team": { "$ref": "#/$defs/team" },
+    "security": { "$ref": "#/$defs/security" },
+    "extensions": { "$ref": "#/$defs/extensions" },
+    "enterprise": { "$ref": "#/$defs/enterprise" }
+  },
+  "$defs": {
+    "project": {
+      "type": "object",
+      "required": ["name", "default_branch", "worktree_root"],
+      "properties": {
+        "name": { "type": "string" },
+        "default_branch": { "type": "string" },
+        "worktree_root": { "type": "string" }
+      }
+    },
+    "git": {
+      "type": "object",
+      "required": ["provider", "remote"],
+      "properties": {
+        "provider": { "type": "string", "enum": ["github", "gitlab", "gitea"] },
+        "remote": { "type": "string" }
+      }
+    },
+    "agent": {
+      "type": "object",
+      "required": ["type", "command"],
+      "properties": {
+        "type": { "type": "string" },
+        "command": { "type": "string" },
+        "args": { "type": "array", "items": { "type": "string" } },
+        "env": { "type": "object", "additionalProperties": { "type": "string" } },
+        "enabled": { "type": "boolean" }
+      }
+    },
+    "policies": {
+      "type": "object",
+      "properties": {
+        "branch": { "type": "object", "properties": { "protected": { "type": "array", "items": { "type": "string" } } } },
+        "paths": {
+          "type": "object",
+          "properties": {
+            "high_risk": { "type": "array", "items": { "type": "string" } },
+            "forbidden": { "type": "array", "items": { "type": "string" } },
+            "forbidden_for_agents": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "commands": {
+          "type": "object",
+          "properties": {
+            "allowed": { "type": "array", "items": { "type": "string" } },
+            "forbidden": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "approval": {
+          "type": "object",
+          "properties": {
+            "high_risk_paths_require_review": { "type": "boolean" },
+            "required_reviewers": { "type": "object", "additionalProperties": { "type": "array", "items": { "type": "string" } } }
+          }
+        },
+        "checks": {
+          "type": "object",
+          "properties": {
+            "required": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["name", "command"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "command": { "type": "string" }
+                }
+              }
+            },
+            "github": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean" },
+                "require_success": { "type": "boolean" },
+                "ref": { "type": "string", "enum": ["target_branch", "base_branch"] }
+              }
+            }
+          }
+        },
+        "merge": {
+          "type": "object",
+          "properties": {
+            "allow_auto_merge_for_low_risk": { "type": "boolean" },
+            "block_merge_if_unverified_items_exist": { "type": "boolean" },
+            "block_merge_if_conflict_exists": { "type": "boolean" }
+          }
+        },
+        "limits": {
+          "type": "object",
+          "properties": {
+            "max_changed_files": { "type": "integer" },
+            "max_insertions": { "type": "integer" },
+            "max_deletions": { "type": "integer" }
+          }
+        }
+      }
+    },
+    "organization": {
+      "type": "object",
+      "properties": {
+        "policies": { "type": "object" }
+      }
+    },
+    "workspace": {
+      "type": "object",
+      "properties": {
+        "env": { "type": "object", "additionalProperties": { "type": "string" } },
+        "cleanup_after_days": { "type": "integer" },
+        "archive_statuses": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "team": {
+      "type": "object",
+      "properties": {
+        "sync": {
+          "type": "object",
+          "properties": {
+            "tasks": { "type": "boolean" },
+            "changedFiles": { "type": "boolean" },
+            "riskLevel": { "type": "boolean" },
+            "verification": { "type": "boolean" },
+            "conflicts": { "type": "boolean" },
+            "agentExecution": { "type": "boolean" },
+            "failureReason": { "type": "boolean" },
+            "filesRead": { "type": "boolean" },
+            "tokenUsage": { "type": "boolean" },
+            "agentNotes": { "type": "boolean" },
+            "reviewContext": { "type": "boolean" },
+            "handoff": { "type": "boolean" },
+            "mode": { "type": "string", "enum": ["manual", "auto"] },
+            "intervalSeconds": { "type": "integer" },
+            "gitNative": {
+              "type": "object",
+              "description": "Git-native sync configuration. Active when team syncMode is 'git-native' or 'hybrid'.",
+              "properties": {
+                "autoExport": { "type": "boolean", "default": true, "description": "Auto-export pending events to outbox on task lifecycle" },
+                "autoImportOnPull": { "type": "boolean", "default": true, "description": "Auto-import outbox events on sync pull" },
+                "cleanupExported": { "type": "boolean", "default": true, "description": "Remove exported event files after push to prevent outbox bloat" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "security": {
+      "type": "object",
+      "properties": {
+        "web": {
+          "type": "object",
+          "properties": {
+            "owners": { "type": "array", "items": { "type": "string" } },
+            "reviewers": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+      }
+    },
+    "extensions": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "modules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+              "name": { "type": "string" },
+              "package": { "type": "string" },
+              "enabled": { "type": "boolean" }
+            }
+          }
+        }
+      }
+    },
+    "enterprise": {
+      "type": "object",
+      "description": "Runtime EE/Team extension configuration. CE defaults are used when omitted.",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "license": { "type": "string", "enum": ["ce", "team", "enterprise", "enterprise-plus"] },
+        "licenseKey": { "type": "string" },
+        "licenseKeyEnv": { "type": "string" },
+        "allowCeFallback": { "type": "boolean" },
+        "forceCeDefaults": { "type": "boolean" },
+        "storage": {
+          "type": "object",
+          "required": ["type", "url"],
+          "properties": {
+            "type": { "type": "string", "enum": ["sqlite", "postgresql"] },
+            "url": { "type": "string" },
+            "poolSize": { "type": "integer", "minimum": 1 },
+            "timeoutMs": { "type": "integer", "minimum": 1 },
+            "ssl": { "type": "boolean" }
+          }
+        },
+        "oidc": {
+          "type": "object",
+          "required": ["issuer", "clientId"],
+          "anyOf": [
+            { "required": ["jwksUri"] },
+            {
+              "required": ["useIntrospection", "introspectionEndpoint"],
+              "properties": { "useIntrospection": { "const": true } }
+            }
+          ],
+          "properties": {
+            "issuer": { "type": "string" },
+            "clientId": { "type": "string" },
+            "clientSecret": { "type": "string" },
+            "jwksUri": { "type": "string" },
+            "audience": { "type": "string" },
+            "userInfoEndpoint": { "type": "string" },
+            "introspectionEndpoint": { "type": "string" },
+            "useIntrospection": { "type": "boolean" },
+            "organizationId": { "type": "string" },
+            "roleMapping": { "type": "object", "additionalProperties": { "type": "string" } }
+          }
+        },
+        "saml": {
+          "type": "object",
+          "required": ["entityId", "assertionConsumerServiceUrl"],
+          "properties": {
+            "entityId": { "type": "string" },
+            "assertionConsumerServiceUrl": { "type": "string" },
+            "idpMetadataUrl": { "type": "string" },
+            "certificate": { "type": "string" },
+            "organizationId": { "type": "string" }
+          }
+        },
+        "rbac": {
+          "type": "object",
+          "properties": {
+            "projectAssignments": { "type": "object" },
+            "globalAssignments": { "type": "object" },
+            "superAdmins": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "siem": {
+          "type": "object",
+          "properties": {
+            "siemWebhookUrl": { "type": "string" },
+            "siemType": { "type": "string", "enum": ["splunk", "datadog", "elastic", "chronicle", "generic"] },
+            "siemToken": { "type": "string" },
+            "autoPush": { "type": "boolean" }
+          }
+        },
+        "compliance": {
+          "type": "object",
+          "properties": {
+            "reportStorageDir": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}
