@@ -84,12 +84,16 @@ if (ci.includes("open-source/main")) {
 if (!ci.includes("pnpm validate:release:metadata")) {
   errors.push(".github/workflows/ci.yml: release metadata gate is missing");
 }
+if (!ci.includes("pnpm audit --audit-level high")) {
+  errors.push(".github/workflows/ci.yml: dependency audit gate is missing");
+}
 
 const releaseWorkflow = read(".github/workflows/release.yml");
 for (const required of [
   "actions/attest@v4",
   "anchore/sbom-action@v0.24.0",
   "docker/build-push-action@v7",
+  "pnpm audit --audit-level high",
   "pnpm release:npm",
 ]) {
   if (!releaseWorkflow.includes(required)) {

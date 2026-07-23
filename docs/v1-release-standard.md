@@ -61,7 +61,7 @@ v1 必须达到：可安装、可启动、可恢复、可测试、可观测、�
 | ------------------------------------ | ----------------------- | -------------------------------------------------------------------------------------------- |
 | Lint / TypeScript / Prettier / Build | ✅ 本地通过             | 全 workspace 门禁通过                                                                        |
 | 全量单测                             | ✅ 本地通过             | 266 tests（含 OIDC、RBAC、PostgreSQL、Server HTTP）                                          |
-| Web 关键路径                         | ✅ 本地通过             | 7 tests；statements 87.75%、branches 68.75%、functions 73.68%、lines 87.75%                  |
+| Web 关键路径                         | ✅ 本地通过             | Vitest 4：7 tests；statements 83.33%、branches 64.28%、functions 71.73%、lines 89.24%         |
 | Web 真实浏览器                       | ✅ 本地通过             | Chromium 验证 Team Sync 错误/保存态和多项目添加                                              |
 | Schema 实例                          | ✅ 本地通过             | 有效配置/示例通过，非法样例被拒绝                                                            |
 | npm tarball 安装                     | ✅ 本地通过             | 5 个本地 tarball 安装，CLI help/version 通过                                                 |
@@ -71,6 +71,7 @@ v1 必须达到：可安装、可启动、可恢复、可测试、可观测、�
 | Docker 真实构建与启动                | ⏳ Phase 8 自动化已启动 | Release workflow 强制执行真实 build、run 和 `/api/health` 检查；需公开 PR 合并后取得远程证据 |
 | Helm 渲染                            | ⏳ Phase 8 自动化已启动 | Release workflow 安装 Helm 并执行 lint/template；目标集群验证仍待执行                        |
 | 公开仓库卫生                         | ✅ 当前通过             | 自动门禁验证当前树、全历史和独立 history root                                                |
+| 依赖漏洞                             | ✅ 当前通过             | 生产及完整依赖 `pnpm audit` 均为 0；CI 阻断 high/critical                                    |
 | 发布供应链                           | ⏳ Phase 8 自动化已启动 | Release workflow 已规划 npm provenance、SBOM、校验和、制品和镜像 attestation                 |
 | 远程 CI / 真发布                     | ⏳ 需公开 PR 和发布凭据 | 正式 npm 发布需要公开仓库 `release` environment 配置 `NPM_TOKEN`                             |
 

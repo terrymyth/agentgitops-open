@@ -9,6 +9,12 @@
     "node": ">=24.0.0"
   },
   "packageManager": "pnpm@9.15.0",
+  "pnpm": {
+    "overrides": {
+      "bundle-require@5.1.0>esbuild": "0.28.1",
+      "tsup@8.5.1>esbuild": "0.28.1"
+    }
+  },
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
