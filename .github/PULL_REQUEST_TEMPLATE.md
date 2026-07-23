@@ -14,7 +14,7 @@ Brief description of what this PR does and why.
 
 - Fixes #[issue number]
 - Related to #[issue number]
-- MVP roadmap phase: [e.g. Phase 1]
+- Roadmap phase: [e.g. Phase 8]
 
 ## Changes
 
@@ -48,6 +48,8 @@ Brief description of what this PR does and why.
 - [ ] Type checking passes (`pnpm typecheck`)
 - [ ] Build passes (`pnpm build`)
 - [ ] Public hygiene passes (`pnpm validate:release -- --public`)
+- [ ] Release metadata passes when package/deployment/release files change (`pnpm validate:release:metadata`)
+- [ ] Public-safe changes contain no private runtime data or internal planning
 - [ ] I have updated the documentation accordingly (if applicable)
 - [ ] My commits follow [Conventional Commits](https://www.conventionalcommits.org/)
 

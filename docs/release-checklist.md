@@ -43,8 +43,11 @@ pnpm typecheck
 pnpm test
 pnpm lint
 pnpm build
+pnpm validate:release:metadata
 pnpm validate:release -- --public
 pnpm validate:release:history
+pnpm smoke:npm-install
+AGENTGITOPS_SMOKE_DEPLOY_REAL=1 pnpm smoke:deployment
 ```
 
 Optional smoke tests:
@@ -62,21 +65,30 @@ pnpm smoke:multi-project-isolation
 - [ ] `pnpm-lock.yaml` is committed and current.
 - [ ] `README.md`, `CONTRIBUTING.md`, `SECURITY.md`, and `LICENSE` are present.
 - [ ] CLI help output matches README examples.
+- [ ] Root package, five publishable packages, Helm Chart and image tag use the same SemVer.
+- [ ] Package and Helm repository metadata points to `terrymyth/agentgitops-open`.
 
 ## 5. GitHub Release
 
-- [ ] Tag version from `main`.
+- [ ] GitHub `release` environment requires approval.
+- [ ] The bootstrap `NPM_TOKEN`, when still required, exists only in the `release` environment with minimum scope and shortest practical lifetime.
+- [ ] Tag `v<version>` from the current protected `main`; never publish from a feature branch or the private repository.
 - [ ] Release notes include:
   - headline capability summary
   - install command
   - breaking changes, if any
   - verification commands run
   - known limitations
-- [ ] Attach screenshots or GIFs if available.
+- [ ] Release workflow publishes npm packages, GHCR image, Helm Chart, source/image SBOM, checksums, and artifact attestations.
+- [ ] Verify the container and release assets with `gh attestation verify`.
 - [ ] Confirm the `public-main-governance` ruleset and required checks are active for `main`.
 
 ## 6. Post-Release
 
+- [ ] Install the CLI from npm in an empty environment and run `agentgitops --version` plus `agentgitops doctor`.
+- [ ] Pull the GHCR image by immutable digest and verify `/api/health`.
+- [ ] Install the released Helm Chart in the target Kubernetes environment and record upgrade/rollback evidence.
+- [ ] After the first npm publication, configure Trusted Publisher for all five packages, remove `NPM_TOKEN` from the workflow environment, and revoke the bootstrap token.
 - [ ] Announce in the chosen community channels.
 - [ ] Watch Issues and Discussions for install failures.
 - [ ] Triage security reports privately according to `SECURITY.md`.

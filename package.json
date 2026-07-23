@@ -27,6 +27,8 @@
     "validate:schemas": "node scripts/validate-schemas.mjs",
     "validate:release": "node scripts/release-hygiene.mjs",
     "validate:release:history": "node scripts/release-history-hygiene.mjs",
+    "validate:release:metadata": "node scripts/validate-release-metadata.mjs",
+    "release:npm": "node scripts/publish-npm.js",
     "release:npm:dry-run": "node scripts/publish-npm.js --dry-run",
     "smoke:git-native-sync": "node scripts/git-native-sync-smoke.mjs",
     "smoke:rebase": "node scripts/rebase-smoke.mjs",
