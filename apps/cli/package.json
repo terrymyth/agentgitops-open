@@ -32,7 +32,7 @@
     "@agentgitops/git": "workspace:*",
     "@agentgitops/local-hub": "workspace:*",
     "@agentgitops/server": "workspace:*",
-    "commander": "^12.1.0"
+    "commander": "^15.0.0"
   },
   "devDependencies": {
     "tsup": "^8.3.0",
