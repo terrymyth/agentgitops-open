@@ -6,6 +6,7 @@ import { tmpdir } from "node:os";
 import { basename, join, resolve } from "node:path";
 
 const root = process.cwd();
+const expectedVersion = JSON.parse(readFileSync(join(root, "package.json"), "utf8")).version;
 const tempRoot = mkdtempSync(join(tmpdir(), "agentgitops-npm-install-"));
 const packDir = join(tempRoot, "packs");
 const installDir = join(tempRoot, "install");
@@ -76,7 +77,7 @@ try {
   );
   const help = run(cliPath, ["--help"], { cwd: installDir });
   const version = run(cliPath, ["--version"], { cwd: installDir }).trim();
-  if (!help.includes("Agent-native GitOps") || version !== "0.1.0") {
+  if (!help.includes("Agent-native GitOps") || version !== expectedVersion) {
     throw new Error(`Installed CLI verification failed (version=${version})`);
   }
 

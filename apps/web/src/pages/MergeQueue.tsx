@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { AlertTriangle, CheckCircle2, GitMerge, RefreshCw, ShieldAlert } from "lucide-react";
 import {
   getMergeQueue,

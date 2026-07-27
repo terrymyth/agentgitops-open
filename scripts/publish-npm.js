@@ -19,7 +19,7 @@
  */
 
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
@@ -34,16 +34,47 @@ const packages = [
   { name: "@agentgitops/server", dir: "apps/server" },
   { name: "agentgitops", dir: "apps/cli" },
 ];
+const packageVersions = packages.map((pkg) => ({
+  ...pkg,
+  version: JSON.parse(readFileSync(path.join(pkg.dir, "package.json"), "utf8")).version,
+}));
+const versions = new Set(packageVersions.map((pkg) => pkg.version));
+if (versions.size !== 1) {
+  throw new Error(
+    `All publishable packages must use the same version: ${packageVersions
+      .map((pkg) => `${pkg.name}=${pkg.version}`)
+      .join(", ")}`,
+  );
+}
+const version = packageVersions[0].version;
+const distTag = version.includes("-") ? "next" : "latest";
 
-console.log(`\n📦 agentgitops npm 发布脚本 ${dryRun ? "(dry-run)" : ""}\n`);
+console.log(
+  `\n📦 agentgitops npm 发布脚本 ${dryRun ? "(dry-run)" : ""} version=${version} tag=${distTag}\n`,
+);
 
 if (!dryRun) {
   const branch = run("git", ["branch", "--show-current"]).trim();
   const status = run("git", ["status", "--porcelain"]).trim();
-  if (branch !== "main") {
+  const origin = normalizeRemote(run("git", ["remote", "get-url", "origin"]));
+  const tagsAtHead = run("git", ["tag", "--points-at", "HEAD"]).split(/\r?\n/).filter(Boolean);
+  if (branch && branch !== "main") {
     throw new Error(`Real npm publishing is only allowed from public main, got ${branch}`);
   }
+  if (origin !== "github.com/terrymyth/agentgitops-open") {
+    throw new Error(`Real npm publishing requires the public repository, got ${origin}`);
+  }
   if (status) throw new Error("Real npm publishing requires a clean worktree");
+  if (!tagsAtHead.includes(`v${version}`)) {
+    throw new Error(`Real npm publishing requires tag v${version} on HEAD`);
+  }
+  try {
+    run("git", ["merge-base", "--is-ancestor", "HEAD", "origin/main"]);
+  } catch {
+    throw new Error(
+      "Real npm publishing requires the tagged commit to be reachable from origin/main",
+    );
+  }
   run("npm", ["whoami"], { stdio: "inherit" });
 }
 
@@ -62,7 +93,16 @@ for (const pkg of packages) {
   console.log(`📦 发布 ${pkg.name}...`);
   const args = dryRun
     ? ["publish", "--dry-run", "--no-git-checks"]
-    : ["publish", "--access", "public", "--publish-branch", "main"];
+    : [
+        "publish",
+        "--access",
+        "public",
+        "--publish-branch",
+        "main",
+        "--provenance",
+        "--tag",
+        distTag,
+      ];
   try {
     run("pnpm", args, { stdio: "inherit", cwd: pkg.dir });
     console.log(`✅ ${pkg.name} 发布成功\n`);
@@ -87,4 +127,12 @@ function run(command, args, options = {}) {
     stdio: options.stdio ?? "pipe",
     env: { ...process.env, npm_config_cache: npmCacheDir },
   });
+}
+
+function normalizeRemote(value) {
+  return value
+    .trim()
+    .replace(/^https:\/\/github\.com\//, "github.com/")
+    .replace(/^git@github\.com:/, "github.com/")
+    .replace(/\.git$/, "");
 }

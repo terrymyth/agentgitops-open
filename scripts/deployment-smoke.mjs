@@ -50,6 +50,19 @@ function runOptional(command, args, name) {
   record(name, "ok", `${command} ${args.join(" ")}`);
 }
 
+function runRequired(command, args, name) {
+  const result = spawnSync(command, args, {
+    cwd: repoRoot,
+    encoding: "utf-8",
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  if (result.status !== 0) {
+    fail(name, `${command} ${args.join(" ")} failed: ${result.stderr || result.stdout}`);
+  }
+  record(name, "ok", `${command} ${args.join(" ")}`);
+  return result;
+}
+
 function validateDockerfile() {
   const dockerfile = read("Dockerfile");
   const dockerignore = read(".dockerignore");
@@ -132,7 +145,65 @@ function validateJsonSchemas() {
   record("json-schema:change-package", "ok", "change package schema parses");
 }
 
-function runRealChecks() {
+async function runContainerHealthSmoke() {
+  if (!realSmoke) {
+    record("docker:health", "skip", "set AGENTGITOPS_SMOKE_DEPLOY_REAL=1 to run");
+    return;
+  }
+
+  const containerName = `agentgitops-smoke-${process.pid}`;
+  const hostPort = process.env.AGENTGITOPS_SMOKE_DEPLOY_PORT ?? "14789";
+  const started = spawnSync(
+    "docker",
+    [
+      "run",
+      "--detach",
+      "--rm",
+      "--name",
+      containerName,
+      "--publish",
+      `127.0.0.1:${hostPort}:4789`,
+      "agentgitops:smoke",
+    ],
+    {
+      cwd: repoRoot,
+      encoding: "utf-8",
+      stdio: ["ignore", "pipe", "pipe"],
+    },
+  );
+  if (started.status !== 0) {
+    fail("docker:health", started.stderr || started.stdout);
+  }
+
+  try {
+    let lastError = "health endpoint did not respond";
+    for (let attempt = 0; attempt < 30; attempt += 1) {
+      try {
+        const response = await fetch(`http://127.0.0.1:${hostPort}/api/health`);
+        if (response.ok) {
+          record("docker:health", "ok", `container health endpoint passed on port ${hostPort}`);
+          return;
+        }
+        lastError = `health endpoint returned HTTP ${response.status}`;
+      } catch (error) {
+        lastError = error instanceof Error ? error.message : String(error);
+      }
+      await new Promise((resolve) => setTimeout(resolve, 1_000));
+    }
+    const logs = spawnSync("docker", ["logs", containerName], {
+      cwd: repoRoot,
+      encoding: "utf-8",
+    });
+    fail("docker:health", `${lastError}\n${logs.stderr || logs.stdout}`);
+  } finally {
+    spawnSync("docker", ["rm", "--force", containerName], {
+      cwd: repoRoot,
+      stdio: "ignore",
+    });
+  }
+}
+
+async function runRealChecks() {
   if (hasCommand("docker")) {
     runOptional("docker", ["build", "-t", "agentgitops:smoke", "."], "docker:build");
     runOptional(
@@ -140,25 +211,22 @@ function runRealChecks() {
       ["compose", "-f", "docker-compose.yml", "config"],
       "docker-compose:config",
     );
+    await runContainerHealthSmoke();
   } else {
+    if (realSmoke) fail("docker:build", "docker is required for the real deployment smoke");
     record("docker:build", "skip", "docker not found");
     record("docker-compose:config", "skip", "docker not found");
+    record("docker:health", "skip", "docker not found");
   }
 
   if (hasCommand("helm")) {
-    const result = spawnSync("helm", ["template", "agentgitops", "deploy/helm"], {
-      cwd: repoRoot,
-      encoding: "utf-8",
-      stdio: ["ignore", "pipe", "pipe"],
-    });
-    if (result.status !== 0) {
-      fail("helm:template", result.stderr || result.stdout);
-    }
+    if (realSmoke) runRequired("helm", ["lint", "deploy/helm"], "helm:lint");
+    const result = runRequired("helm", ["template", "agentgitops", "deploy/helm"], "helm:template");
     if (!result.stdout.includes("kind: Deployment") || !result.stdout.includes("/api/health")) {
       fail("helm:template", "rendered manifest missing deployment or health endpoint");
     }
-    record("helm:template", "ok", "rendered chart includes deployment and health probes");
   } else {
+    if (realSmoke) fail("helm:template", "helm is required for the real deployment smoke");
     record("helm:template", "skip", "helm not found");
   }
 }
@@ -168,7 +236,7 @@ validateCompose();
 validateHelmStatic();
 validateOpenApi();
 validateJsonSchemas();
-runRealChecks();
+await runRealChecks();
 
 for (const result of results) {
   const prefix = result.status === "ok" ? "PASS" : result.status === "skip" ? "SKIP" : "FAIL";

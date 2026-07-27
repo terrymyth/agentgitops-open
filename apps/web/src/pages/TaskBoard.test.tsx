@@ -1,5 +1,5 @@
-import { MemoryRouter } from "react-router-dom";
-import { render, screen, waitFor } from "@testing-library/react";
+import { MemoryRouter } from "react-router";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { TaskContract } from "@agentgitops/core";
@@ -72,9 +72,15 @@ describe("TaskBoard", () => {
     renderBoard();
 
     await screen.findByText("暂无任务");
-    await user.type(screen.getByPlaceholderText("任务标题"), "  Secure merge gate  ");
-    await user.type(screen.getByPlaceholderText("目标说明"), "Prevent unsafe merge");
-    await user.type(screen.getByPlaceholderText("验证命令，逗号分隔"), "pnpm lint, pnpm test");
+    fireEvent.change(screen.getByPlaceholderText("任务标题"), {
+      target: { value: "  Secure merge gate  " },
+    });
+    fireEvent.change(screen.getByPlaceholderText("目标说明"), {
+      target: { value: "Prevent unsafe merge" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("验证命令，逗号分隔"), {
+      target: { value: "pnpm lint, pnpm test" },
+    });
     await user.click(screen.getByRole("button", { name: "新建任务" }));
 
     await waitFor(() =>

@@ -31,6 +31,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Audit dependencies
+        run: pnpm audit --audit-level high
+
       - name: Lint
         run: pnpm lint
 
@@ -63,6 +66,9 @@ jobs:
 
       - name: Validate schemas
         run: pnpm validate:schemas
+
+      - name: Validate release metadata
+        run: pnpm validate:release:metadata
 
       - name: Deployment asset smoke
         run: pnpm smoke:deployment

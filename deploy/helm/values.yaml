@@ -4,7 +4,7 @@
 replicaCount: 1
 
 image:
-  repository: agentgitops/server
+  repository: ghcr.io/terrymyth/agentgitops-open
   pullPolicy: IfNotPresent
   tag: "0.1.0"
 

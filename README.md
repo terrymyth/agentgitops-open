@@ -134,6 +134,9 @@ See [`docs/architecture.md`](./docs/architecture.md) for the full technical arch
 ## Quick Start
 
 > CE is a v1 release candidate. The commands below describe the implemented developer experience; production release requires every gate in the [v1 release standard](./docs/v1-release-standard.md) to pass.
+> Phase 8 Release Closure is now active; follow the
+> [Phase 8 plan](./docs/phase8-release-closure.md) and
+> [release process](./docs/release-process.md) for current delivery status.
 
 ### Install from npm
 
@@ -285,6 +288,8 @@ See [`docs/configuration.md`](./docs/configuration.md) for all options.
 | [`docs/naming-conventions.md`](./docs/naming-conventions.md) | Naming conventions & project boundaries |
 | [`docs/ai-coding-event-summary-spec.md`](./docs/ai-coding-event-summary-spec.md) | AI Coding event summary spec |
 | [`docs/relay-deployment.md`](./docs/relay-deployment.md) | Relay deployment guide |
+| [`docs/phase8-release-closure.md`](./docs/phase8-release-closure.md) | Phase 8 release closure tasks and gates |
+| [`docs/release-process.md`](./docs/release-process.md) | Public npm, GHCR, Helm, SBOM and attestation process |
 | [`docs/release-checklist.md`](./docs/release-checklist.md) | Release checklist for maintainers |
 
 ---
@@ -332,7 +337,11 @@ agentgitops/
 
 ## Status
 
-**v1 Release Candidate.** The planned Phase 0-7 product capabilities are implemented; release hardening and external publication are tracked separately in the [v1 release standard](./docs/v1-release-standard.md). Implemented capabilities include:
+**v1 Release Candidate / Phase 8 active.** The planned Phase 0-7 product capabilities are
+implemented; release hardening and external publication are tracked in the
+[Phase 8 plan](./docs/phase8-release-closure.md) and
+[v1 release standard](./docs/v1-release-standard.md). Implemented capabilities include:
+
 - Local-first CLI MVP with full task/workspace/agent/change-package lifecycle
 - Web governance console (Dashboard, TaskBoard, MergeQueue, ConflictCenter, AuditEvents, AgentOps, TeamBoard, TeamSyncSettings, ContextFeedPreview, ConflictGraph, SharedMergeQueue)
 - GitHub/GitLab PR integration with Change Package injection

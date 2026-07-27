@@ -9,6 +9,14 @@
     "node": ">=24.0.0"
   },
   "packageManager": "pnpm@9.15.0",
+  "pnpm": {
+    "overrides": {
+      "brace-expansion": "5.0.8",
+      "bundle-require@5.1.0>esbuild": "0.28.1",
+      "postcss": "8.5.18",
+      "tsup@8.5.1>esbuild": "0.28.1"
+    }
+  },
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
@@ -27,6 +35,8 @@
     "validate:schemas": "node scripts/validate-schemas.mjs",
     "validate:release": "node scripts/release-hygiene.mjs",
     "validate:release:history": "node scripts/release-history-hygiene.mjs",
+    "validate:release:metadata": "node scripts/validate-release-metadata.mjs",
+    "release:npm": "node scripts/publish-npm.js",
     "release:npm:dry-run": "node scripts/publish-npm.js --dry-run",
     "smoke:git-native-sync": "node scripts/git-native-sync-smoke.mjs",
     "smoke:rebase": "node scripts/rebase-smoke.mjs",
