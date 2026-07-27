@@ -10,7 +10,7 @@ import {
   TaskManager,
   createExtensionRegistry,
 } from "@agentgitops/local-hub";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import {
   applyConflictAction,
   buildAgentOpsMetrics,
@@ -20,6 +20,23 @@ import {
   resolveEnterpriseAuthorizationTarget,
   verifyGitHubSignature,
 } from "./index.js";
+
+const fixturePaths = new Set<string>();
+
+afterEach(async () => {
+  const paths = [...fixturePaths];
+  fixturePaths.clear();
+  await Promise.all(
+    paths.map((fixturePath) =>
+      fs.rm(fixturePath, {
+        recursive: true,
+        force: true,
+        maxRetries: 5,
+        retryDelay: 100,
+      }),
+    ),
+  );
+});
 
 describe("GitHub webhook signature", () => {
   it("validates sha256 signatures", () => {
@@ -231,6 +248,7 @@ describe("governance API", () => {
 
 async function createProjectFixture(): Promise<{ projectPath: string; taskId: string }> {
   const projectPath = await fs.mkdtemp(path.join(os.tmpdir(), "agentgitops-server-"));
+  fixturePaths.add(projectPath);
   await ConfigLoader.init(projectPath, "server-test", { force: true });
   const task = await new TaskManager(projectPath).create({
     projectName: "server-test",
