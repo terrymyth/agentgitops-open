@@ -30,7 +30,7 @@ Phase 8 不增加新的功能面。它把已经实现的能力收口为可安装
 | P8-003 | GHCR 镜像发布与健康检查    | 进行中 | 镜像真实启动且 `/api/health` 成功                   |
 | P8-004 | Helm lint/template/package | 进行中 | Release workflow 生成 Chart 制品                    |
 | P8-005 | SBOM、校验和与制品证明     | 进行中 | Release assets 可用 `gh attestation verify` 验证    |
-| P8-006 | 依赖升级审查               | 已完成 | 当前 audit 为 0；CI 阻断 high/critical 并分组升级   |
+| P8-006 | 依赖升级审查               | 进行中 | CI 阻断 high/critical；新公告触发安全版本迁移与复验 |
 | P8-007 | 正式候选版本发布           | 待开始 | npm、GHCR、GitHub Release 三端消费者验证            |
 | P8-008 | 目标 Kubernetes 集群 smoke | 待开始 | 部署、探针、持久卷、升级和回滚记录                  |
 | P8-009 | npm OIDC 可信发布迁移      | 待开始 | 首次发布后启用 Trusted Publisher 并撤销长期 token   |

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { AlertTriangle, GitPullRequestDraft, RefreshCw } from "lucide-react";
 import { getConflicts, runConflictAction, type ConflictSummary } from "../api.js";
 import { useActor } from "../actor.js";

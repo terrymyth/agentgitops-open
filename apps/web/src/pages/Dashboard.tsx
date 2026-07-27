@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { Activity, CheckCircle2, AlertTriangle, GitPullRequest, RefreshCw } from "lucide-react";
 import { initProject, getProject, type ProjectSummary } from "../api.js";
 import { useActor } from "../actor.js";
