@@ -3,8 +3,8 @@
 > 状态：Release Candidate
 > 生效日期：2026-07-21
 > Phase 8 启动日期：2026-07-23
-> 适用范围：CE、公开的 Team/Enterprise 运行时扩展、npm 包、GHCR 镜像、Helm Chart 和
-> 公开仓库 `terrymyth/agentgitops-open` 的 `main`
+> 适用范围：私有研发仓库 `terrymyth/agentgitops`、公开发行仓库
+> `terrymyth/agentgitops-open`、npm 包、GHCR 镜像和 Helm Chart
 
 本文档是 agentgitops v1 的统一验收目标。历史功能任务标记“已完成”，不代表产品已可发布；只有下列 P0 门禁全部通过，才能将状态改为 Production Ready。
 
@@ -55,7 +55,7 @@ v1 必须达到：可安装、可启动、可恢复、可测试、可观测、�
 
 这些门禁未完成前，项目状态保持 Release Candidate。
 
-## 6. 2026-07-21 审查快照
+## 6. 2026-08-03 审查快照
 
 | 项目                                 | 状态                    | 证据 / 剩余动作                                                                              |
 | ------------------------------------ | ----------------------- | -------------------------------------------------------------------------------------------- |
@@ -68,12 +68,13 @@ v1 必须达到：可安装、可启动、可恢复、可测试、可观测、�
 | npm 发布流程                         | ✅ dry-run 通过         | 5 个包逐个 `pnpm publish --dry-run`；真发布需 npm 权限                                       |
 | 跨模块 smoke                         | ✅ 本地通过             | Git-native、PR body/dry-run、rebase、Team Sync E2E、Relay HMAC/cursor、multi-project         |
 | Compose                              | ✅ 本地通过             | `docker compose config --quiet`                                                              |
-| Docker 真实构建与启动                | ⏳ Phase 8 自动化已启动 | Release workflow 强制执行真实 build、run 和 `/api/health` 检查；需公开 PR 合并后取得远程证据 |
-| Helm 渲染                            | ⏳ Phase 8 自动化已启动 | Release workflow 安装 Helm 并执行 lint/template；目标集群验证仍待执行                        |
-| 公开仓库卫生                         | ✅ 当前通过             | 自动门禁验证当前树、全历史和独立 history root                                                |
+| Docker 真实构建与启动                | ✅ 远程通过             | 公开 Release run `30831169919` 真实 build、run 和 `/api/health` 通过                         |
+| Helm 渲染与制品                      | ✅ 远程通过             | lint/template、独立 Chart 命名、归档内容门禁通过；目标集群由 P8-008 单独验证                 |
+| 公开仓库卫生                         | ✅ 当前通过             | 双仓审计验证当前树、全历史和独立 history root                                                |
 | 依赖漏洞                             | ✅ 当前通过             | 生产及完整依赖 `pnpm audit` 均为 0；CI 阻断 high/critical                                    |
-| 发布供应链                           | ⏳ Phase 8 自动化已启动 | Release workflow 已规划 npm provenance、SBOM、校验和、制品和镜像 attestation                 |
-| 远程 CI / 真发布                     | ⏳ 需公开 PR 和发布凭据 | 正式 npm 发布需要公开仓库 `release` environment 配置 `NPM_TOKEN`                             |
+| 发布供应链                           | 🟡 源码侧远程通过       | 源 SBOM、SHA-256、8 个制品 attestation 已验证；镜像 SBOM/attestation 待正式 tag              |
+| 远程 CI                              | ✅ 三平台通过           | 公开 main run `30830713360`；Linux、macOS、Windows 全绿                                      |
+| 真发布                               | ⏳ 需版本与发布凭据     | 正式 npm bootstrap 需要 `release` environment 的短期 `NPM_TOKEN`，之后迁移 Trusted Publisher |
 
 ## 7. 版本口径
 

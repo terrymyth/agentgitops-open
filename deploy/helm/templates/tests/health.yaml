@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ .Release.Name }}-health-test"
+  labels:
+    {{- include "agentgitops.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  restartPolicy: Never
+  containers:
+    - name: health
+      image: busybox:1.37.0
+      command:
+        - wget
+        - --quiet
+        - --spider
+        - "http://{{ .Release.Name }}:{{ .Values.service.port }}/api/health"

@@ -34,8 +34,8 @@ git push origin "v<version>"
 
 4. `Release` workflow 将重新执行全量门禁、真实部署 smoke、npm dry-run，并生成：
 
-   - 五个 npm tarball；
-   - Helm Chart；
+   - 五个 npm tarball（CLI 为 `agentgitops-<version>.tgz`）；
+   - 独立命名的 Helm Chart `agentgitops-chart-<version>.tgz`；
    - 源码和镜像 SPDX JSON SBOM；
    - `SHA256SUMS`；
    - GHCR 镜像；
@@ -72,13 +72,14 @@ gh attestation verify \
   --repo terrymyth/agentgitops-open
 
 helm install agentgitops \
-  "https://github.com/terrymyth/agentgitops-open/releases/download/v<version>/agentgitops-<version>.tgz"
+  "https://github.com/terrymyth/agentgitops-open/releases/download/v<version>/agentgitops-chart-<version>.tgz"
 ```
 
 下载 Release assets 后，运行：
 
 ```bash
 sha256sum --check SHA256SUMS
+pnpm validate:release:artifacts -- /path/to/downloaded-release-assets
 gh attestation verify <artifact> --repo terrymyth/agentgitops-open
 ```
 

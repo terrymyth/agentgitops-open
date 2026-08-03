@@ -12,7 +12,7 @@ Phase 8 不增加新的功能面。它把已经实现的能力收口为可安装
 只有同时满足以下条件，Phase 8 才能标记完成：
 
 1. 私有仓库变更通过私有 PR 合并，公开安全部分通过独立公开 PR 合并。
-2. 五个 npm 包、CLI、Helm Chart 和 Git tag 使用同一个 SemVer。
+2. 五个 npm 包（含 CLI）、Helm Chart 和 Git tag 使用同一个 SemVer。
 3. 空缓存 npm 安装、Docker 真实启动、Compose 配置、Helm lint/template 全部通过。
 4. 公开 tag 自动产生 npm provenance、GHCR 镜像、源码与镜像 SBOM、SHA-256 校验和和
    GitHub Artifact Attestation。
@@ -25,17 +25,30 @@ Phase 8 不增加新的功能面。它把已经实现的能力收口为可安装
 
 | 编号   | 任务                       | 状态   | 验收证据                                            |
 | ------ | -------------------------- | ------ | --------------------------------------------------- |
-| P8-001 | 双仓与版本事实源收口       | 进行中 | 文档不再依赖 `open-source/main`；版本元数据自动校验 |
-| P8-002 | npm 发布保护与 provenance  | 进行中 | 仅公开仓库 `main` 的匹配 tag 可真发布               |
-| P8-003 | GHCR 镜像发布与健康检查    | 进行中 | 镜像真实启动且 `/api/health` 成功                   |
-| P8-004 | Helm lint/template/package | 进行中 | Release workflow 生成 Chart 制品                    |
-| P8-005 | SBOM、校验和与制品证明     | 进行中 | Release assets 可用 `gh attestation verify` 验证    |
-| P8-006 | 依赖升级审查               | 已完成 | 本地及三平台 audit 为 0；CI 阻断 high/critical      |
-| P8-007 | 正式候选版本发布           | 待开始 | npm、GHCR、GitHub Release 三端消费者验证            |
-| P8-008 | 目标 Kubernetes 集群 smoke | 待开始 | 部署、探针、持久卷、升级和回滚记录                  |
-| P8-009 | npm OIDC 可信发布迁移      | 待开始 | 首次发布后启用 Trusted Publisher 并撤销长期 token   |
+| P8-001 | 双仓与版本事实源收口       | 已完成       | 双仓 PR 链、独立历史和版本元数据门禁已验证                         |
+| P8-002 | npm 发布保护与 provenance  | 自动化完成   | 仅公开仓库 `main` 的匹配 tag 可真发布；待 P8-007 实发验证          |
+| P8-003 | GHCR 镜像发布与健康检查    | 启动验证完成 | Release run `30831169919` 真实构建、启动并通过 `/api/health`       |
+| P8-004 | Helm lint/template/package | 已完成       | lint/template、6 归档唯一性和独立 Chart 制品已验证                 |
+| P8-005 | SBOM、校验和与制品证明     | 源码侧完成   | 8 个 main 制品通过 SHA-256 和 attestation；镜像侧待 tag            |
+| P8-006 | 依赖升级审查               | 已完成       | 本地及三平台 audit 为 0；CI 阻断 high/critical                     |
+| P8-007 | 正式候选版本发布           | 外部待办     | 需要发布版本决策、npm bootstrap 权限和三端消费者验证               |
+| P8-008 | 目标 Kubernetes 集群 smoke | 自动化就绪   | 受保护 workflow 覆盖部署、探针、PVC、升级、回滚和清理；待 kubeconfig |
+| P8-009 | npm OIDC 可信发布迁移      | 外部待办     | 首次发布后配置 Trusted Publisher 并撤销 bootstrap token            |
 
-## 3. 发布顺序
+## 3. 2026-08-03 远程证据
+
+- 公开 `main` 三平台 CI：run `30830713360`；Linux、macOS、Windows 全绿。
+- 非标签 Release：run `30831169919`；真实 Docker/Compose/Helm、npm dry-run、源 SBOM、
+  SHA-256、Artifact upload 和 attestation 全绿。
+- 下载后独立验证：五个 npm 包与 `agentgitops-chart-0.1.0.tgz` 共六个唯一归档均存在；
+  `SHA256SUMS` 覆盖七个内容制品，连同校验文件共八个文件均通过限定公开 `main` 和
+  `release.yml` 的 `gh attestation verify`。
+- 非标签运行按设计跳过 GHCR push、镜像 SBOM/attestation、npm publish 和 GitHub Release，
+  因而不能替代 P8-007 的正式候选版本验证。
+- v1 Helm 明确阻断多副本：本地工作区和 ReadWriteOnce PVC 尚不具备并发写入一致性，不能用
+  HPA 或 `replicaCount > 1` 伪装成已支持水平扩展。
+
+## 4. 发布顺序
 
 ```text
 私有功能分支
@@ -52,7 +65,7 @@ Phase 8 不增加新的功能面。它把已经实现的能力收口为可安装
 
 禁止从私有仓库创建公开 tag、发布 npm 包或推送 GHCR 正式镜像。
 
-## 4. 阻断条件
+## 5. 阻断条件
 
 - 版本不一致、tag 不匹配或 npm 元数据指向私有仓库。
 - 公开历史卫生检查失败。
@@ -63,7 +76,7 @@ Phase 8 不增加新的功能面。它把已经实现的能力收口为可安装
 - npm 包已具备 Trusted Publisher 条件但仍长期依赖可复用写 token。
 - 依赖重大版本升级未通过完整测试和迁移审查。
 
-## 5. 回滚策略
+## 6. 回滚策略
 
 - npm 已发布版本不可覆盖；发现问题后发布修复版本，必要时通过 dist-tag 撤下默认推荐。
 - GHCR 镜像按不可变 digest 使用；回滚到上一个已验证 digest，不复用已发布 tag。
