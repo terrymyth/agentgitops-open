@@ -27,18 +27,18 @@ Phase 8 不增加新的功能面。它把已经实现的能力收口为可安装
 | ------ | -------------------------- | ------ | --------------------------------------------------- |
 | P8-001 | 双仓与版本事实源收口       | 已完成       | 双仓 PR 链、独立历史和版本元数据门禁已验证                         |
 | P8-002 | npm 发布保护与 provenance  | 自动化完成   | 仅公开仓库 `main` 的匹配 tag 可真发布；待 P8-007 实发验证          |
-| P8-003 | GHCR 镜像发布与健康检查    | 启动验证完成 | Release run `30831169919` 真实构建、启动并通过 `/api/health`       |
-| P8-004 | Helm lint/template/package | 已完成       | lint/template、6 归档唯一性和独立 Chart 制品已验证                 |
+| P8-003 | GHCR 镜像发布与健康检查    | 启动验证完成 | Release run `30857307421` 真实构建、启动并通过 `/api/health`       |
+| P8-004 | Helm lint/template/package | 已完成       | lint/template、6 归档唯一性、Ingress/Secret/health hook 已验证     |
 | P8-005 | SBOM、校验和与制品证明     | 源码侧完成   | 8 个 main 制品通过 SHA-256 和 attestation；镜像侧待 tag            |
-| P8-006 | 依赖升级审查               | 已完成       | 本地及三平台 audit 为 0；CI 阻断 high/critical                     |
+| P8-006 | 依赖升级审查               | 已完成       | 三项新增供应链公告已修复，完整 audit 为 0；CI 阻断 high/critical   |
 | P8-007 | 正式候选版本发布           | 外部待办     | 需要发布版本决策、npm bootstrap 权限和三端消费者验证               |
-| P8-008 | 目标 Kubernetes 集群 smoke | 自动化就绪   | 受保护 workflow 覆盖部署、探针、PVC、升级、回滚和清理；待 kubeconfig |
+| P8-008 | 目标 Kubernetes 集群 smoke | 自动化就绪   | 受保护 environment/workflow 已配置；待 kubeconfig、namespace 和镜像 |
 | P8-009 | npm OIDC 可信发布迁移      | 外部待办     | 首次发布后配置 Trusted Publisher 并撤销 bootstrap token            |
 
 ## 3. 2026-08-03 远程证据
 
-- 公开 `main` 三平台 CI：run `30830713360`；Linux、macOS、Windows 全绿。
-- 非标签 Release：run `30831169919`；真实 Docker/Compose/Helm、npm dry-run、源 SBOM、
+- 公开 `main` 三平台 CI：run `30853846219`；Linux、macOS、Windows 全绿。
+- 非标签 Release：run `30857307421`；真实 Docker/Compose/Helm、npm dry-run、源 SBOM、
   SHA-256、Artifact upload 和 attestation 全绿。
 - 下载后独立验证：五个 npm 包与 `agentgitops-chart-0.1.0.tgz` 共六个唯一归档均存在；
   `SHA256SUMS` 覆盖七个内容制品，连同校验文件共八个文件均通过限定公开 `main` 和
@@ -47,6 +47,8 @@ Phase 8 不增加新的功能面。它把已经实现的能力收口为可安装
   因而不能替代 P8-007 的正式候选版本验证。
 - v1 Helm 明确阻断多副本：本地工作区和 ReadWriteOnce PVC 尚不具备并发写入一致性，不能用
   HPA 或 `replicaCount > 1` 伪装成已支持水平扩展。
+- GitHub `kubernetes-smoke` environment 已限制为受保护分支并要求 reviewer；截至本快照未配置
+  `KUBE_CONFIG_DATA`、`KUBE_NAMESPACE` 或 `KUBE_CONTEXT`，因此未伪造目标集群运行结果。
 
 ## 4. 发布顺序
 
