@@ -1,0 +1,8 @@
+{{- if ne (int .Values.replicaCount) 1 }}
+{{- fail "replicaCount must remain 1 in v1 because local workspace state and ReadWriteOnce persistence are not multi-replica safe" }}
+{{- end }}
+{{- range $key, $_ := .Values.env }}
+{{- if regexMatch "(TOKEN|SECRET|PASSWORD|API_KEY)$" (upper $key) }}
+{{- fail (printf "env.%s is sensitive and must be supplied through existingSecret instead of Helm values" $key) }}
+{{- end }}
+{{- end }}

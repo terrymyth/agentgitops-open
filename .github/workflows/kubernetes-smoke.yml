@@ -1,0 +1,145 @@
+name: Kubernetes Smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: Published GHCR SemVer tag to validate
+        required: true
+        default: "0.1.0"
+        type: string
+      kubectl_version:
+        description: kubectl version compatible with the target cluster
+        required: true
+        default: "v1.36.3"
+        type: string
+
+concurrency:
+  group: kubernetes-smoke-${{ github.repository }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    if: github.repository == 'terrymyth/agentgitops-open' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: kubernetes-smoke
+    timeout-minutes: 20
+    env:
+      IMAGE_TAG: ${{ inputs.image_tag }}
+      KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+      KUBE_CONTEXT: ${{ vars.KUBE_CONTEXT }}
+      KUBECONFIG: ${{ runner.temp }}/agentgitops-kubeconfig
+      RELEASE_NAME: agentgitops-smoke-${{ github.run_id }}-${{ github.run_attempt }}
+      SMOKE_NAMESPACE: ${{ vars.KUBE_NAMESPACE }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v5
+        with:
+          version: 4.2.3
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v5
+        with:
+          version: ${{ inputs.kubectl_version }}
+
+      - name: Configure target cluster
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ ! "$IMAGE_TAG" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "image_tag must be a GHCR-safe SemVer without a leading v or build metadata" >&2
+            exit 1
+          fi
+          if [[ -z "$KUBE_CONFIG_DATA" ]]; then
+            echo "KUBE_CONFIG_DATA is required in the kubernetes-smoke environment" >&2
+            exit 1
+          fi
+          if [[ ! "$SMOKE_NAMESPACE" =~ ^agentgitops-smoke([-.][a-z0-9]([-a-z0-9]*[a-z0-9])?)*$ ]]; then
+            echo "KUBE_NAMESPACE must name a dedicated agentgitops-smoke namespace" >&2
+            exit 1
+          fi
+          printf '%s' "$KUBE_CONFIG_DATA" | base64 --decode > "$KUBECONFIG"
+          chmod 600 "$KUBECONFIG"
+          if [[ -n "$KUBE_CONTEXT" ]]; then
+            kubectl config use-context "$KUBE_CONTEXT"
+          fi
+          kubectl cluster-info
+          kubectl get namespace "$SMOKE_NAMESPACE"
+
+      - name: Install and verify health, probes and persistence
+        shell: bash
+        run: |
+          set -euo pipefail
+          helm upgrade --install "$RELEASE_NAME" deploy/helm \
+            --namespace "$SMOKE_NAMESPACE" \
+            --set-string image.tag="$IMAGE_TAG" \
+            --set persistence.enabled=true \
+            --wait \
+            --timeout 5m
+          kubectl rollout status "deployment/$RELEASE_NAME" \
+            --namespace "$SMOKE_NAMESPACE" \
+            --timeout 3m
+          kubectl wait "pvc/$RELEASE_NAME-pvc" \
+            --namespace "$SMOKE_NAMESPACE" \
+            --for=jsonpath='{.status.phase}'=Bound \
+            --timeout 2m
+          helm test "$RELEASE_NAME" --namespace "$SMOKE_NAMESPACE" --logs
+          kubectl exec "deployment/$RELEASE_NAME" \
+            --namespace "$SMOKE_NAMESPACE" \
+            -- sh -c 'printf phase8-smoke > /workspace/.phase8-smoke'
+
+      - name: Upgrade and verify persistent data
+        shell: bash
+        run: |
+          set -euo pipefail
+          helm upgrade "$RELEASE_NAME" deploy/helm \
+            --namespace "$SMOKE_NAMESPACE" \
+            --reuse-values \
+            --set-string env.AGENTGITOPS_SMOKE_REVISION="$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" \
+            --wait \
+            --timeout 5m
+          kubectl rollout status "deployment/$RELEASE_NAME" \
+            --namespace "$SMOKE_NAMESPACE" \
+            --timeout 3m
+          kubectl exec "deployment/$RELEASE_NAME" \
+            --namespace "$SMOKE_NAMESPACE" \
+            -- grep -qx phase8-smoke /workspace/.phase8-smoke
+          helm test "$RELEASE_NAME" --namespace "$SMOKE_NAMESPACE" --logs
+
+      - name: Roll back and verify recovery
+        shell: bash
+        run: |
+          set -euo pipefail
+          helm rollback "$RELEASE_NAME" 1 \
+            --namespace "$SMOKE_NAMESPACE" \
+            --wait \
+            --timeout 5m
+          kubectl rollout status "deployment/$RELEASE_NAME" \
+            --namespace "$SMOKE_NAMESPACE" \
+            --timeout 3m
+          kubectl exec "deployment/$RELEASE_NAME" \
+            --namespace "$SMOKE_NAMESPACE" \
+            -- grep -qx phase8-smoke /workspace/.phase8-smoke
+          helm test "$RELEASE_NAME" --namespace "$SMOKE_NAMESPACE" --logs
+          helm history "$RELEASE_NAME" --namespace "$SMOKE_NAMESPACE"
+
+      - name: Clean up smoke release and persistent volume claim
+        if: always()
+        shell: bash
+        run: |
+          if [[ "$SMOKE_NAMESPACE" =~ ^agentgitops-smoke([-.][a-z0-9]([-a-z0-9]*[a-z0-9])?)*$ ]]; then
+            helm uninstall "$RELEASE_NAME" --namespace "$SMOKE_NAMESPACE" --wait || true
+            kubectl delete pvc \
+              --namespace "$SMOKE_NAMESPACE" \
+              --selector "app.kubernetes.io/instance=$RELEASE_NAME" \
+              --wait=false || true
+          else
+            echo "Skipping cleanup because KUBE_NAMESPACE did not pass the smoke namespace guard" >&2
+          fi

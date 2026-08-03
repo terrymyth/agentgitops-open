@@ -110,6 +110,10 @@ function validateHelmStatic() {
   const values = read("deploy/helm/values.yaml");
   const deployment = read("deploy/helm/templates/deployment.yaml");
   const service = read("deploy/helm/templates/service.yaml");
+  const ingress = read("deploy/helm/templates/ingress.yaml");
+  const validation = read("deploy/helm/templates/validate.yaml");
+  const helmTest = read("deploy/helm/templates/tests/health.yaml");
+  const kubernetesWorkflow = read(".github/workflows/kubernetes-smoke.yml");
   if (!chart.includes("apiVersion: v2")) fail("helm:static", "Chart.yaml is not v2");
   if (!values.includes("port: 4789")) fail("helm:static", "values.yaml missing service port");
   if (!values.includes("path: /api/health"))
@@ -117,9 +121,46 @@ function validateHelmStatic() {
   if (!deployment.includes("livenessProbe:") || !deployment.includes("readinessProbe:")) {
     fail("helm:static", "deployment missing health probes");
   }
+  for (const token of ["existingSecret", "envFrom:", ".Values.tolerations", ".Values.affinity"]) {
+    if (!deployment.includes(token)) fail("helm:static", `deployment missing ${token}`);
+  }
   if (!service.includes("port: {{ .Values.service.port }}"))
     fail("helm:static", "service missing templated port");
-  record("helm:static", "ok", "chart, values, deployment and service templates present");
+  if (!ingress.includes("kind: Ingress") || !ingress.includes(".Values.ingress.enabled")) {
+    fail("helm:static", "ingress values are not backed by a template");
+  }
+  if (
+    !validation.includes("replicaCount must remain 1") ||
+    !validation.includes("must be supplied through existingSecret")
+  ) {
+    fail("helm:static", "unsafe multi-replica or plaintext secret configuration is not blocked");
+  }
+  if (!helmTest.includes('"helm.sh/hook": test') || !helmTest.includes("/api/health")) {
+    fail("helm:static", "Helm health test is missing");
+  }
+  for (const token of [
+    "environment: kubernetes-smoke",
+    "KUBE_CONFIG_DATA",
+    "KUBE_NAMESPACE",
+    "helm test",
+    "helm rollback",
+    "kubectl wait",
+    "kubectl delete pvc",
+  ]) {
+    if (!kubernetesWorkflow.includes(token)) {
+      fail("kubernetes-smoke:static", `workflow missing ${token}`);
+    }
+  }
+  record(
+    "helm:static",
+    "ok",
+    "deployment, service, secret, scheduler, ingress, single-replica guard and health test present",
+  );
+  record(
+    "kubernetes-smoke:static",
+    "ok",
+    "protected namespace-scoped install, probe, PVC, upgrade, rollback and cleanup workflow present",
+  );
 }
 
 function validateOpenApi() {
@@ -224,6 +265,24 @@ async function runRealChecks() {
     const result = runRequired("helm", ["template", "agentgitops", "deploy/helm"], "helm:template");
     if (!result.stdout.includes("kind: Deployment") || !result.stdout.includes("/api/health")) {
       fail("helm:template", "rendered manifest missing deployment or health endpoint");
+    }
+    const optionalResult = runRequired(
+      "helm",
+      [
+        "template",
+        "agentgitops",
+        "deploy/helm",
+        "--set",
+        "ingress.enabled=true",
+        "--set-string",
+        "existingSecret=agentgitops-secrets",
+      ],
+      "helm:optional-features",
+    );
+    for (const token of ["kind: Ingress", "secretRef:", 'name: "agentgitops-secrets"']) {
+      if (!optionalResult.stdout.includes(token)) {
+        fail("helm:optional-features", `rendered manifest missing ${token}`);
+      }
     }
   } else {
     if (realSmoke) fail("helm:template", "helm is required for the real deployment smoke");
