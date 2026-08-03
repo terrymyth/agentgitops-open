@@ -121,7 +121,7 @@ jobs:
           labels: ${{ steps.docker-meta.outputs.labels }}
 
       - name: Prepare artifact directory
-        run: mkdir -p release-artifacts
+        run: mkdir -p release-artifacts "$RUNNER_TEMP/agentgitops-helm"
 
       - name: Generate source SBOM
         uses: anchore/sbom-action@v0.24.0
@@ -149,7 +149,12 @@ jobs:
             pnpm --dir "$package_dir" pack --pack-destination "$GITHUB_WORKSPACE/release-artifacts"
           done
           helm lint deploy/helm
-          helm package deploy/helm --destination release-artifacts
+          chart_version="$(node -p "require('./package.json').version")"
+          helm package deploy/helm --destination "$RUNNER_TEMP/agentgitops-helm"
+          mv \
+            "$RUNNER_TEMP/agentgitops-helm/agentgitops-${chart_version}.tgz" \
+            "release-artifacts/agentgitops-chart-${chart_version}.tgz"
+          pnpm validate:release:artifacts
           (
             cd release-artifacts
             find . -maxdepth 1 -type f ! -name SHA256SUMS -print0 \

@@ -94,7 +94,9 @@ for (const required of [
   "anchore/sbom-action@v0.24.0",
   "docker/build-push-action@v7",
   "pnpm audit --audit-level high",
+  "pnpm validate:release:artifacts",
   "pnpm release:npm",
+  "agentgitops-chart-${chart_version}.tgz",
 ]) {
   if (!releaseWorkflow.includes(required)) {
     errors.push(`.github/workflows/release.yml: missing ${required}`);
