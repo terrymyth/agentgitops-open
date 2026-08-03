@@ -1,0 +1,3 @@
+# pnpm owns the lockfile serialization. CI validates it with
+# `pnpm install --frozen-lockfile` instead of rewriting it with Prettier.
+pnpm-lock.yaml

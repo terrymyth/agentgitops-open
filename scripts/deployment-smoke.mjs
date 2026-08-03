@@ -29,7 +29,7 @@ function parseJson(relativePath) {
   }
 }
 
-function hasCommand(command, args = ["--version"]) {
+function hasCommand(command, args) {
   const result = spawnSync(command, args, { cwd: repoRoot, encoding: "utf-8", stdio: "ignore" });
   return result.status === 0;
 }
@@ -204,7 +204,7 @@ async function runContainerHealthSmoke() {
 }
 
 async function runRealChecks() {
-  if (hasCommand("docker")) {
+  if (hasCommand("docker", ["--version"])) {
     runOptional("docker", ["build", "-t", "agentgitops:smoke", "."], "docker:build");
     runOptional(
       "docker",
@@ -219,7 +219,7 @@ async function runRealChecks() {
     record("docker:health", "skip", "docker not found");
   }
 
-  if (hasCommand("helm")) {
+  if (hasCommand("helm", ["version", "--short"])) {
     if (realSmoke) runRequired("helm", ["lint", "deploy/helm"], "helm:lint");
     const result = runRequired("helm", ["template", "agentgitops", "deploy/helm"], "helm:template");
     if (!result.stdout.includes("kind: Deployment") || !result.stdout.includes("/api/health")) {
