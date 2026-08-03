@@ -68,12 +68,13 @@ v1 必须达到：可安装、可启动、可恢复、可测试、可观测、�
 | npm 发布流程                         | ✅ dry-run 通过         | 5 个包逐个 `pnpm publish --dry-run`；真发布需 npm 权限                                       |
 | 跨模块 smoke                         | ✅ 本地通过             | Git-native、PR body/dry-run、rebase、Team Sync E2E、Relay HMAC/cursor、multi-project         |
 | Compose                              | ✅ 本地通过             | `docker compose config --quiet`                                                              |
-| Docker 真实构建与启动                | ✅ 远程通过             | 公开 Release run `30831169919` 真实 build、run 和 `/api/health` 通过                         |
-| Helm 渲染与制品                      | ✅ 远程通过             | lint/template、独立 Chart 命名、归档内容门禁通过；目标集群由 P8-008 单独验证                 |
+| Docker 真实构建与启动                | ✅ 远程通过             | 公开 Release run `30857307421` 真实 build、run 和 `/api/health` 通过                         |
+| Helm 渲染与制品                      | ✅ 远程通过             | lint/template、独立 Chart、Ingress/Secret/health hook 通过；目标集群由 P8-008 单独验证       |
 | 公开仓库卫生                         | ✅ 当前通过             | 双仓审计验证当前树、全历史和独立 history root                                                |
-| 依赖漏洞                             | ✅ 当前通过             | 生产及完整依赖 `pnpm audit` 均为 0；CI 阻断 high/critical                                    |
+| 依赖漏洞                             | ✅ 当前通过             | 完整 `pnpm audit` 为 0；新增 brace-expansion、PostCSS、fast-uri 公告已修复                   |
 | 发布供应链                           | 🟡 源码侧远程通过       | 源 SBOM、SHA-256、8 个制品 attestation 已验证；镜像 SBOM/attestation 待正式 tag              |
-| 远程 CI                              | ✅ 三平台通过           | 公开 main run `30830713360`；Linux、macOS、Windows 全绿                                      |
+| 远程 CI                              | ✅ 三平台通过           | 公开 main run `30853846219`；Linux、macOS、Windows 全绿                                      |
+| Kubernetes 目标集群                  | 🟡 自动化就绪           | 受保护 environment/workflow 已配置；待专用 kubeconfig、namespace 与已发布镜像 tag           |
 | 真发布                               | ⏳ 需版本与发布凭据     | 正式 npm bootstrap 需要 `release` environment 的短期 `NPM_TOKEN`，之后迁移 Trusted Publisher |
 
 ## 7. 版本口径
